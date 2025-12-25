@@ -133,7 +133,7 @@ async function loadEvent(event) {
         }
       })
     );
-    const validwhitelistedresults = results.filter(r => r !== null);
+    const validwhitelistedresults = whitelistedresults.filter(r => r !== null);
     validwhitelistedresults.forEach(userData => {
       const raceData = userData[event.raceId];
       if (!raceData || !raceData.statistic_user) return;
