@@ -124,7 +124,7 @@ async function loadEvent(event) {
     ];
 
     const whitelistedresults = await Promise.all(
-      allUsers.map(async id => {
+      whitelistedUsers.map(async id => {
         try {
           return await fetchUserRaceStat(id);
         } catch (err) {
