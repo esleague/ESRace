@@ -6,7 +6,7 @@ const BASE_API = "https://apivrace.vnexpress.net";
 async function fetchUserRaceStat(myvneId) {
   const url = `${BASE_API}/user/profile-race` +
     `?myvne_id=${myvneId}` +
-    `&type=1&offset=0&limit=6&action=1&lang=vi`;
+    `&type=1&offset=0&limit=6&action=1&lang=vi&_=${Date.now()}`;
 
   const res = await fetch(url);
   const json = await res.json();
@@ -15,11 +15,27 @@ async function fetchUserRaceStat(myvneId) {
     throw new Error("API error");
   }
 
+  const resultWithId = {};
+  for (const [raceId, raceData] of Object.entries(json.data)) {
+    resultWithId[raceId] = { ...raceData, myvne_id: myvneId };
+  }
+  return resultWithId;
+}
+
+async function fetchUserActivities(myvneId, raceId) {
+  const res = await fetch(
+    `${BASE_API}/user/get-result-activity?myvne_id=${myvneId}&race_id=${raceId}&_=${Date.now()}`
+  );
+  const json = await res.json();
+
+  if (json.code !== 200 || !Array.isArray(json.data)) {
+    return [];
+  }
   return json.data;
 }
 
 async function fetchRaceInfoByCode(raceCode) {
-  const url = `${BASE_API}/race/detail?code_url=${raceCode}&select=statistic&lang=vi`;
+  const url = `${BASE_API}/race/detail?code_url=${raceCode}&select=statistic&lang=vi&_=${Date.now()}`;
 
   const res = await fetch(url);
   const json = await res.json();
@@ -42,4 +58,3 @@ async function fetchRaceInfoByCode(raceCode) {
     endTime: race.race_time.to_time * 1000
   };
 }
-
