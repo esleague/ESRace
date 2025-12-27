@@ -1,5 +1,6 @@
 let currentRunners = [];
 let currentHelpers = null;
+let currentSort = "distance";
 
 
 const eventListEl = document.getElementById("eventList");
@@ -50,29 +51,65 @@ function timeStringToSeconds(str) {
 function applySort(type) {
   if (!currentRunners.length) return;
 
-  const sorted = [...currentRunners];
+  currentSort = type;
 
   switch (type) {
     case "distance":
-      sorted.sort((a, b) => b.totalKm - a.totalKm);
+      currentRunners.sort((a, b) => b.totalKm - a.totalKm);
       break;
 
     case "time":
-      // MOST TIME first
-      sorted.sort((a, b) => b.totalTimeSeconds - a.totalTimeSeconds);
+      currentRunners.sort((a, b) => b.totalTimeSeconds - a.totalTimeSeconds);
       break;
 
     case "pace":
-      // FASTEST first (smaller pace = faster)
-      sorted.sort((a, b) => a.paceSeconds - b.paceSeconds);
+      currentRunners.sort((a, b) => a.paceSeconds - b.paceSeconds);
       break;
   }
 
-  renderLeaderboard(sorted, currentHelpers);
-}document.getElementById("sortSelect").addEventListener("change", (e) => {
-  applySort(e.target.value);
-});
+  renderLeaderboard(currentRunners, currentHelpers);
+}
 
+
+function formatTotalTime(seconds) {
+  if (!seconds || seconds <= 0) return "-";
+
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+
+  if (d > 0) return `${d} ngày ${h} giờ ${m} phút`;
+  if (h > 0) return `${h} giờ ${m} phút`;
+  return `${m} phút`;
+}
+
+function formatAvgPace(paceSeconds) {
+  if (!paceSeconds || !isFinite(paceSeconds)) return "-";
+  const m = Math.floor(paceSeconds / 60);
+  const s = paceSeconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")} /km`;
+}
+
+// 🥇🥈🥉 Rank highlight helpers
+function getRankStyle(index) {
+  if (index === 0) {
+    return "bg-amber-50 border-amber-300 text-amber-700";
+  }
+  if (index === 1) {
+    return "bg-slate-100 border-slate-300 text-slate-700";
+  }
+  if (index === 2) {
+    return "bg-orange-50 border-orange-300 text-orange-700";
+  }
+  return "bg-white border-slate-200 text-slate-800";
+}
+
+function getMedal(index) {
+  if (index === 0) return "🥇";
+  if (index === 1) return "🥈";
+  if (index === 2) return "🥉";
+  return "";
+}
 
 
 function formatDateRange(from, to) {
@@ -160,122 +197,175 @@ function isUserWhitelisted(event, userId) {
   return false;
 }
 
+function createSkeletonRow() {
+  const el = document.createElement("div");
+  el.className =
+    "bg-white rounded shadow p-4 flex items-center gap-4 animate-pulse";
+
+  el.innerHTML = `
+    <div class="w-8 h-6 bg-gray-200 rounded"></div>
+
+    <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+
+    <div class="flex-1 space-y-2">
+      <div class="h-4 bg-gray-200 rounded w-1/3"></div>
+      <div class="h-3 bg-gray-100 rounded w-1/4"></div>
+    </div>
+
+    <div class="h-5 bg-gray-200 rounded w-16"></div>
+  `;
+
+  return el;
+}
+
+
+function updateAvatar(myvneId, avatarUrl) {
+  const imgs = document.querySelectorAll(
+    `img[data-user-id="${myvneId}"]`
+  );
+  imgs.forEach(img => (img.src = avatarUrl));
+}
+
+
+async function enrichRunnersInBackground(runners, raceId) {
+  // limit concurrency
+  const pool = [];
+
+  for (const r of runners) {
+    pool.push((async () => {
+      // Avatar
+      try {
+        r.avatar = sanitizeURL(await getUserAvatar(r.myvne_id));
+        updateAvatar(r.myvne_id, r.avatar);
+      } catch {}
+
+      // Activities
+      try {
+        const stats = await fetchUserActivities(r.myvne_id, raceId);
+        r.stats = stats;
+        r.statsHtml = renderStatisticsTable(stats);
+
+        let totalTime = 0;
+        let totalDistance = 0;
+
+        stats.forEach(a => {
+          totalTime += Number(a.elapsed_time || 0);
+          totalDistance += Number(a.distance || 0);
+        });
+
+        r.totalTimeSeconds = totalTime;
+        r.paceSeconds =
+          totalDistance > 0
+            ? Math.round(totalTime / (totalDistance / 1000))
+            : Infinity;
+
+      } catch {}
+    })());
+
+    // throttle
+    if (pool.length >= 5) {
+      await Promise.race(pool);
+      pool.splice(0, pool.length - 4);
+    }
+  }
+}
+function statisticsSkeleton() {
+  return `
+    <div class="animate-pulse space-y-3 p-4">
+      ${Array.from({ length: 3 })
+        .map(
+          () => `
+          <div class="grid grid-cols-4 gap-2">
+            <div class="h-3 bg-gray-200 rounded"></div>
+            <div class="h-3 bg-gray-200 rounded"></div>
+            <div class="h-3 bg-gray-200 rounded"></div>
+            <div class="h-3 bg-gray-200 rounded"></div>
+          </div>`
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function updateEventStats(runners) {
+  const totalKmAll = runners.reduce((s, r) => s + (r.totalKm || 0), 0);
+  const activeUsers = runners.filter(r => r.totalKm > 0).length;
+
+  document.getElementById("eventStats").innerHTML = `
+    <div>
+      <span class="font-semibold text-gray-700">🏁 Tổng quãng đường:</span>
+      <span class="font-semibold">${totalKmAll.toFixed(2)} km</span>
+    </div>
+    <div>
+      <span class="font-semibold text-gray-700">🏃 Số người đã chạy:</span>
+      <span class="font-semibold">${activeUsers}</span>
+    </div>
+  `;
+}
+
+
 async function loadEvent(event) {
   eventTitleEl.textContent = event.name;
-  leaderboardEl.innerHTML = "⏳ Loading...";
+  leaderboardEl.innerHTML = "";
+  for (let i = 0; i < 8; i++) {
+    leaderboardEl.appendChild(createSkeletonRow());
+  }
 
   try {
-    // Fetch all users IN PARALLEL
-    const allUsers = [
-      ...event.members,
-      ...(event.whitelist || [])
-    ];
+    // ---------- PHASE 1: fetch race stats (FAST) ----------
+    const allUsers = [...event.members, ...(event.whitelist || [])];
 
-    const results = await Promise.all(
-      allUsers.map(async id => {
-        try {
-          return await fetchUserRaceStat(id);
-        } catch (err) {
-          console.error(`Failed to fetch stats for user ${id}:`, err);
-          return null; 
-        }
-      })
+    const results = await Promise.allSettled(
+      allUsers.map(id => fetchUserRaceStat(id))
     );
 
-    const validResults = results.filter(r => r !== null);
     const runners = [];
 
-    for (const userData of validResults) {
-      const raceData = userData[event.raceId];
-      if (!raceData || !raceData.statistic_user) return;
+    for (const r of results) {
+      if (r.status !== "fulfilled") continue;
+
+      const raceData = r.value[event.raceId];
+      if (!raceData?.statistic_user) continue;
 
       const u = raceData.statistic_user;
       const isWhitelisted = event.whitelist?.includes(raceData.myvne_id);
-      let avatarR = "";
-      try {
-        avatarR = await getUserAvatar(raceData.myvne_id);
-      } catch (e) {
-        console.error("Avatar fetch failed:", u.myvne_id);
-      }
-
-      const stats = await fetchUserActivities(raceData.myvne_id, event.raceId);
-
-      // Calculate totals from activity API
-      let totalTimeSeconds = 0;
-      let totalDistance = 0;
-
-      stats.forEach(a => {
-        totalTimeSeconds += Number(a.elapsed_time || 0);
-        totalDistance += Number(a.distance || 0);
-      });
-
-      const paceSeconds =
-        totalDistance > 0
-          ? Math.round(totalTimeSeconds / (totalDistance / 1000))
-          : Infinity;
 
       runners.push({
         name: DOMPurify.sanitize(u.user_name, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] }),
-        avatar: sanitizeURL(avatarR),
-        totalKm: Number(u.total_km_achieve),
+        avatar: "", // placeholder
+        totalKm: Number(u.total_km_achieve || 0),
         ranking: u.ranking,
         pace: u.avg_pace,
         myvne_id: raceData.myvne_id,
         isCompetitive: !isWhitelisted,
-        totalTimeSeconds,
-        paceSeconds,
-        stats,
-        statsHtml: renderStatisticsTable(stats)
-      });
-    };
 
-    // Sort by distance DESC
+        // stats filled later
+        totalTimeSeconds: 0,
+        paceSeconds: Infinity,
+        stats: null,
+        statsHtml: null
+      });
+    }
+
+    // ---------- PHASE 2: render IMMEDIATELY ----------
     runners.sort((a, b) => b.totalKm - a.totalKm);
 
-    const raceInfo = await fetchRaceInfoByCode(event.raceCode);
+    currentRunners = runners;
+    currentHelpers = { raceId: event.raceId };
 
+    renderLeaderboard(runners, currentHelpers);
+
+    // Event meta
+    const raceInfo = await fetchRaceInfoByCode(event.raceCode);
     document.getElementById("eventDate").innerHTML =
       formatDateRange(raceInfo.fromTime, raceInfo.endTime);
-
     startCountdown(raceInfo.fromTime, raceInfo.endTime);
 
+    // Event statistics (instant)
+    updateEventStats(runners);
 
-
-    var helpers = {
-      raceId: event.raceId
-    };
-    currentRunners = runners;
-    currentHelpers = helpers;
-
-    applySort("distance"); // default
-    const sortSelect = document.getElementById("sortSelect");
-
-    sortSelect.onchange = () => {
-      applySort(sortSelect.value);
-    };
-
-    const totalKmAll = runners.reduce(
-      (sum, r) => sum + (r.totalKm || 0),
-      0
-    );
-
-    const activeUsers = runners.filter(r => r.totalKm > 0).length;
-    const eventStatsEl = document.getElementById("eventStats");
-
-    eventStatsEl.innerHTML = `
-      <div>
-        <span class="font-semibold text-gray-700">🏁 Tổng quãng đường:</span>
-        <span class="font-semibold">
-          ${totalKmAll.toFixed(2)} km
-        </span>
-      </div>
-      <div>
-        <span class="font-semibold text-gray-700">🏃 Số người đã chạy:</span>
-        <span class="font-semibold">
-          ${activeUsers}
-        </span>
-      </div>
-    `;
+    // ---------- PHASE 3: background enrichment ----------
+    enrichRunnersInBackground(runners, event.raceId);
 
   } catch (err) {
     console.error(err);
@@ -283,7 +373,9 @@ async function loadEvent(event) {
   }
 }
 
+
 function renderLeaderboard(runners, helpers) {
+  leaderboardEl.innerHTML = "";
   if (!runners || runners.length === 0) {
     leaderboardEl.textContent = "No data";
     return;
@@ -292,31 +384,40 @@ function renderLeaderboard(runners, helpers) {
   leaderboardEl.innerHTML = "";
 
   runners.forEach((r, i) => {
-    const rank = i + 1;
 
+    const index = i;
     // --- Wrapper for row + stats ---
     const wrapper = document.createElement("div");
     wrapper.className = "flex flex-col mb-2";
 
     // --- Main row ---
     const row = document.createElement("div");
-    row.className = "bg-white rounded shadow p-4 flex items-center gap-4 relative";
+    // row.className = "bg-white rounded shadow p-4 flex items-center gap-4 relative";
+    row.className = `
+        flex items-center gap-3 px-4 py-3 mb-2
+        border rounded-xl
+        transition-all duration-300
+        ${getRankStyle(index)}
+      `;
 
-    if (rank === 1) row.classList.add("ring-2", "ring-yellow-400");
-    if (rank === 2) row.classList.add("ring-2", "ring-gray-400");
-    if (rank === 3) row.classList.add("ring-2", "ring-orange-400");
+
 
     // Rank badge
     const rankEl = document.createElement("div");
     rankEl.className = "font-bold text-xl w-8 text-center";
-    rankEl.textContent = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+    // rankEl.textContent = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+    rankEl.textContent = getMedal(index);
 
     // Avatar
     const avatar = document.createElement("img");
-    avatar.src = r.avatar;
     avatar.alt = "";
-    avatar.className = "w-12 h-12 rounded-full";
     avatar.loading = "lazy";
+    avatar.dataset.userId = r.myvne_id;
+    avatar.src = r.avatar || "assets/images/running-duck.gif";
+    avatar.className = "w-12 h-12 rounded-full bg-gray-200 transition-opacity opacity-0";
+    avatar.onload = () => {
+      avatar.classList.remove("opacity-0");
+    };
 
     // Name + whitelist icon + global rank
     const info = document.createElement("div");
@@ -346,14 +447,26 @@ function renderLeaderboard(runners, helpers) {
     info.appendChild(globalRank);
 
     // Distance
-    const km = document.createElement("div");
-    km.className = "font-bold text-lg";
-    km.textContent = `${r.totalKm.toFixed(2)} km`;
+    const metric = document.createElement("div");
+    metric.className = "font-bold text-lg text-right min-w-[90px]";
+
+    if (currentSort === "distance") {
+      metric.textContent = `${r.totalKm.toFixed(2)} km`;
+      metric.classList.add("text-slate-900");
+    } 
+    else if (currentSort === "time") {
+      metric.textContent = formatTotalTime(r.totalTimeSeconds);
+      metric.classList.add("text-indigo-600");
+    } 
+    else if (currentSort === "pace") {
+      metric.textContent = formatAvgPace(r.paceSeconds);
+      metric.classList.add("text-emerald-600");
+    }
 
     row.appendChild(rankEl);
     row.appendChild(avatar);
     row.appendChild(info);
-    row.appendChild(km);
+    row.appendChild(metric);
 
     // --- Statistics toggle ---
     const statBtn = document.createElement("div");
@@ -370,9 +483,11 @@ function renderLeaderboard(runners, helpers) {
 
     statBtn.addEventListener("click", () => {
       if (!statContainer.dataset.loaded) {
-        statContainer.innerHTML =
-          r.statsHtml ||
-          "<div class='text-gray-500 text-center'>Không có dữ liệu</div>";
+            if (!r.statsHtml) {
+        statContainer.innerHTML = statisticsSkeleton();
+      } else {
+        statContainer.innerHTML = r.statsHtml;
+      }
         statContainer.dataset.loaded = "true";
       }
 
@@ -478,6 +593,13 @@ function formatPace(seconds, distance) {
 // Init
 renderEvents();
 
-document.getElementById("sortSelect").addEventListener("change", (e) => {
-  applySort(e.target.value);
+document.querySelectorAll("#sortGroup .sort-btn").forEach(btn => {
+  btn.onclick = () => {
+    document
+      .querySelectorAll("#sortGroup .sort-btn")
+      .forEach(b => b.classList.remove("active"));
+
+    btn.classList.add("active");
+    applySort(btn.dataset.sort);
+  };
 });

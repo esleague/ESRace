@@ -18,7 +18,7 @@
 
   <!-- Header -->
   <header class="bg-indigo-600 text-white p-4">
-    <h1 class="text-2xl font-bold">🏃 vRace Leaderboard</h1>
+    <h1 class="text-2xl font-bold">🏃 ESRace Leaderboard</h1>
     <p class="text-sm opacity-90">Theo dõi thành tích</p>
   </header>
 
@@ -27,7 +27,7 @@
 
     <!-- Event list -->
     <aside class="bg-white rounded shadow p-4">
-      <h2 class="font-semibold mb-3">📅 Sự kiện</h2>
+      <h2 class="font-semibold mb-3">📅 Giải chạy</h2>
       <ul id="eventList" class="space-y-2"></ul>
     </aside>
 
@@ -45,13 +45,19 @@
         </div>
 
 
-        <div class="mt-3 flex justify-end">
-            <select id="sortSelect"
-            class="border rounded px-2 py-1 text-sm">
-            <option value="distance">Quãng đường (km)</option>
-            <option value="time">Thời gian</option>
-            <option value="pace">Pace</option>
-            </select>
+        <div class="mt-4 flex justify-end">
+          <div id="sortGroup"
+              class="inline-flex bg-gray-100 rounded-xl p-1 shadow-inner">
+            <button data-sort="distance" class="sort-btn active">
+              📏 Km
+            </button>
+            <button data-sort="time" class="sort-btn">
+              ⏱ Time
+            </button>
+            <button data-sort="pace" class="sort-btn">
+              ⚡ Pace
+            </button>
+          </div>
         </div>
         </div>
 
