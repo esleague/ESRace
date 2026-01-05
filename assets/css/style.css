@@ -53,22 +53,21 @@ body {
 }
 
 
-  .sort-btn {
-    padding: 6px 12px;
-    font-size: 0.875rem;
-    border-radius: 0.75rem;
-    font-weight: 600;
-    color: #4b5563;
-    transition: all 0.2s;
-  }
+.sort-btn {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  color: #4b5563;
+  transition: all 0.2s;
+}
 
-  .sort-btn:hover {
-    background: rgba(99, 102, 241, 0.1);
-  }
+.sort-btn:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
 
-  .sort-btn.active {
-    background: white;
-    color: #4338ca;
-    box-shadow: 0 1px 4px rgba(0,0,0,.12);
-  }
-  
+.sort-btn.active {
+  background: white;
+  color: #4338ca;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+}

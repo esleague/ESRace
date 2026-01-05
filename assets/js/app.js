@@ -108,7 +108,7 @@ function getMedal(index) {
   if (index === 0) return "🥇";
   if (index === 1) return "🥈";
   if (index === 2) return "🥉";
-  return "";
+  return index + 1;
 }
 
 
@@ -357,8 +357,7 @@ async function loadEvent(event) {
 
     // Event meta
     const raceInfo = await fetchRaceInfoByCode(event.raceCode);
-    document.getElementById("eventDate").innerHTML =
-      formatDateRange(raceInfo.fromTime, raceInfo.endTime);
+    document.getElementById("eventDate").innerHTML = formatDateRange(raceInfo.fromTime, raceInfo.endTime);
     startCountdown(raceInfo.fromTime, raceInfo.endTime);
 
     // Event statistics (instant)
@@ -404,7 +403,7 @@ function renderLeaderboard(runners, helpers) {
 
     // Rank badge
     const rankEl = document.createElement("div");
-    rankEl.className = "font-bold text-xl w-8 text-center";
+    rankEl.className = "font-bold text-xm w-8 text-center";
     // rankEl.textContent = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
     rankEl.textContent = getMedal(index);
 
