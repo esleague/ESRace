@@ -1,1 +1,0 @@
-window.RACE_CONFIGS = [];

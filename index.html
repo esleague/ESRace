@@ -2,82 +2,171 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <title>ESRace Leaderboard</title>
-  <link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAALrUAADM6AAAwNsAANr3AGNj/wAI3vsAANPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiIiIgAAAAAid3dyIAAAAidBEXdyAAACdBMzFHcgAAJ3EzMWRyAAACERERFHIAAAJ0ZmZkcgAAZmZmAAByAFVmZmYAAAIAVWYGZgAAAAAAZmZmAAAAAAAGZmAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAPgPAADwBwAA4AMAAOABAADgAQAA8AEAAPABAADgeQAAgH0AAIB/AADgfwAA8P8AAP//AAD//wAA" rel="icon" type="image/x-icon">
-  <!-- Tailwind CDN -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>vRace Leaderboard</title>
+  <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAALrUAADM6AAAwNsAANr3AGNj/wAI3vsAANPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiIiIgAAAAAid3dyIAAAAidBEXdyAAACdBMzFHcgAAJ3EzMWRyAAACERERFHIAAAJ0ZmZkcgAAZmZmAAByAFVmZmYAAAIAVWYGZgAAAAAAZmZmAAAAAAAGZmAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAPgPAADwBwAA4AMAAOABAADgAQAA8AEAAPABAADgeQAAgH0AAIB/AADgfwAA8P8AAP//AAD//wAA" />
+  
   <script src="https://cdn.tailwindcss.com"></script>
-  <script
-    src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"
-    crossorigin="anonymous">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1'
+            }
+          }
+        }
+      }
+    }
   </script>
-
-
-  <link rel="stylesheet" href="assets/css/style.css" />
+  
+  <style>
+    @keyframes shimmer {
+      0% { background-position: -1000px 0; }
+      100% { background-position: 1000px 0; }
+    }
+    
+    .skeleton {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 1000px 100%;
+      animation: shimmer 2s infinite;
+    }
+    
+    .border-3 {
+      border-width: 3px;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
 
+<body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+  
   <!-- Header -->
-  <header class="bg-indigo-600 text-white p-4">
-    <h1 class="text-2xl font-bold">🏃 ESRace Leaderboard</h1>
-    <p class="text-sm opacity-90">🦆 Duck, Assemble!</p>
+  <header class="bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 py-6">
+      <h1 class="text-3xl font-bold">🏃 vRace Leaderboard</h1>
+      <p class="text-primary-100 text-sm mt-1">Track your running achievements</p>
+    </div>
   </header>
 
-  <!-- Main -->
-  <main class="max-w-6xl mx-auto p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- Race Selector -->
+    <div class="mb-8">
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">📅 Select Race</h2>
+      <div id="raceList" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Race cards will be inserted here -->
+      </div>
+    </div>
 
-    <!-- Event list -->
-    <aside class="bg-white rounded shadow p-4">
-      <h2 class="font-semibold mb-3">📅 Giải chạy</h2>
-      <ul id="eventList" class="space-y-2"></ul>
-    </aside>
-
-    <!-- Leaderboard -->
-    <section class="md:col-span-3 bg-white rounded shadow p-4">
-        <div class="mb-4">
-        <h2 id="eventTitle" class="text-xl font-semibold">
-            Chọn sự kiện
-        </h2>
-
-        <div id="eventTime" class="mt-2 text-sm text-gray-600 space-y-1">
-        <div id="eventDate" class="mt-2 text-sm text-gray-600 space-y-1"></div>
-        <div id="countdown" class="mt-2 text-sm text-gray-600 space-y-1"></div>
-        <div id="eventStats" class="mt-2 text-sm text-gray-600 space-y-1"></div>
+    <!-- Race Details Section (hidden initially) -->
+    <div id="raceSection" class="hidden">
+      
+      <!-- Race Header -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h2 id="raceName" class="text-2xl font-bold text-slate-800"></h2>
+            <p id="raceDescription" class="text-slate-600 mt-1"></p>
+          </div>
+          <button id="backBtn" class="self-start md:self-center px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium transition">
+            ← Back to Races
+          </button>
         </div>
+        
+        <!-- Race Info Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
+            <div class="text-sm text-blue-600 font-medium">📅 Duration</div>
+            <div id="raceDuration" class="text-lg font-bold text-blue-900 mt-1"></div>
+          </div>
+          <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
+            <div class="text-sm text-green-600 font-medium">🏃 Participants</div>
+            <div id="totalRunners" class="text-lg font-bold text-green-900 mt-1">0</div>
+          </div>
+          <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+            <div class="text-sm text-purple-600 font-medium">📏 Total Distance</div>
+            <div id="totalDistance" class="text-lg font-bold text-purple-900 mt-1">0 km</div>
+          </div>
+          <div class="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-4">
+            <div class="text-sm text-orange-600 font-medium">⏱️ Status</div>
+            <div id="raceStatus" class="text-lg font-bold text-orange-900 mt-1"></div>
+          </div>
+        </div>
+      </div>
 
-
-        <div class="mt-4 flex justify-end">
-          <div id="sortGroup"
-              class="inline-flex bg-gray-100 rounded-xl p-1 shadow-inner">
-            <button data-sort="distance" class="sort-btn active">
-              📏 Km
+      <!-- Sort & Filter -->
+      <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h3 class="text-lg font-semibold text-slate-700">🏆 Leaderboard</h3>
+          
+          <div class="flex gap-2">
+            <button data-sort="km" class="sort-btn active px-4 py-2 rounded-lg text-sm font-medium transition">
+              📏 Distance
             </button>
-            <button data-sort="time" class="sort-btn">
-              ⏱ Time
-            </button>
-            <button data-sort="pace" class="sort-btn">
+            <button data-sort="pace" class="sort-btn px-4 py-2 rounded-lg text-sm font-medium transition">
               ⚡ Pace
+            </button>
+            <button data-sort="activities" class="sort-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+              🔢 Activities
             </button>
           </div>
         </div>
-        </div>
-
-
-      <div id="leaderboard" class="space-y-3">
-        <p class="text-gray-500">Chưa có dữ liệu</p>
       </div>
-    </section>
 
+      <!-- Leaderboard Table -->
+      <div id="leaderboard" class="space-y-3">
+        <!-- Runner rows will be inserted here -->
+      </div>
+          
+          <div class="flex gap-2">
+            <button data-sort="km" class="sort-btn active px-4 py-2 rounded-lg text-sm font-medium transition">
+              📏 Distance
+            </button>
+            <button data-sort="pace" class="sort-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+              ⚡ Pace
+            </button>
+            <button data-sort="activities" class="sort-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+              🔢 Activities
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div id="leaderboard" class="space-y-3">
+        <!-- Runner rows will be inserted here -->
+      </div>
+
+    </div>
   </main>
 
-  <script src="assets/js/config.js"></script>
-  <!-- Race configs -->
-  <script src="assets/js/races/race_309.js"></script>
-  <script src="assets/js/races/race_247.js"></script>
+  <!-- Activity Modal -->
+  <div id="activityModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+      <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+        <div>
+          <h3 id="modalRunnerName" class="text-xl font-bold text-slate-800"></h3>
+          <p id="modalRunnerStats" class="text-sm text-slate-600 mt-1"></p>
+        </div>
+        <button id="closeModal" class="text-slate-400 hover:text-slate-600 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      
+      <div id="modalContent" class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+        <!-- Activities will be inserted here -->
+      </div>
+    </div>
+  </div>
 
-  <script src="assets/js/api.js"></script>
-  <script src="assets/js/utils.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
-  <script src="assets/js/app.js"></script>
-  
+  <script type="module" src="app.js"></script>
 </body>
 </html>
