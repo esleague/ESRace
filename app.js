@@ -1,7 +1,8 @@
 // ==========================================
 // CONFIG
 // ==========================================
-const API_BASE = 'http://localhost:8787/api/v1';
+// const API_BASE = 'http://localhost:8787/api/v1';
+const API_BASE = 'https://esrace-backend.esrace.workers.dev/api/v1';
 
 // ==========================================
 // STATE
@@ -46,13 +47,13 @@ function formatDate(timestamp) {
   });
 }
 function formatPaceFromMs(speedMs) {
-    if (!speedMs || speedMs <= 0) return "0:00 / km";
+    if (!speedMs || speedMs <= 0) return "0:00";
 
     const secondsPerKm = 1000 / speedMs;
     const minutes = Math.floor(secondsPerKm / 60);
     const seconds = Math.round(secondsPerKm % 60);
 
-    return `${minutes}:${seconds.toString().padStart(2, '0')} / km`;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 
@@ -104,6 +105,34 @@ function getRankCircleStyle(rank) {
   return 'bg-slate-100 border-slate-300 text-slate-600';
 }
 
+function paceToSecondsPerKm(pace) {
+  if (!pace) return null;
+
+  // pace is like "6.29", "10.89"
+  const value = parseFloat(pace);
+  if (isNaN(value)) return null;
+
+  // minutes.decimal → seconds
+  return value * 60;
+}
+
+function calculateTotalTimeSeconds(totalKm, avgSpeed) {
+  if (!totalKm || !avgSpeed || avgSpeed <= 0) return Infinity;
+  const secondsPerKm = 1000 / avgSpeed;
+  return secondsPerKm * totalKm;
+}
+
+function formatDuration(seconds) {
+  if (!seconds || seconds === Infinity) return '-';
+
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+
 // ==========================================
 // RENDERING
 // ==========================================
@@ -154,7 +183,7 @@ function renderLeaderboard(runners) {
           <div class="w-12 h-12 rounded-full ${getRankCircleStyle(runner.rank)} flex items-center justify-center border-2">
             <span class="font-bold text-lg">${runner.rank}</span>
           </div>
-          ${isTopThree ? `<div class="absolute -top-1 -right-1 text-2xl">${getMedalIcon(runner.rank)}</div>` : ''}
+          <!-- ${isTopThree ? `<div class="absolute -top-1 -right-1 text-2xl">${getMedalIcon(runner.rank)}</div>` : ''} -->
         </div>
         
         <img 
@@ -168,13 +197,11 @@ function renderLeaderboard(runners) {
             <div class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}</div>
             ${!runner.is_competitive ? 
               '<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300 flex-shrink-0">🛡️</span>' 
-              : 
-              // '<span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded-full border border-green-300 flex-shrink-0">🏆</span>'
+              :
               ''
             }
           </div>
           <div class="text-sm text-slate-600 mt-1 flex items-center gap-3 flex-wrap">
-            <span>📊 ${runner.total_activities} activities</span>
             <span>⚡ ${formatPace(runner.avg_pace)}</span>
           </div>
         </div>
@@ -233,7 +260,7 @@ function renderActivities(activities, runnerName, stats) {
               </div>
               <div>
                 <div class="text-xs text-slate-500">Speed</div>
-                <div class="font-medium text-slate-700">${formatPaceFromMs(activity.average_speed_ms)}</div>
+                <div class="font-medium text-slate-700">${formatPaceFromMs(activity.average_speed_ms)} / km</div>
               </div>
             </div>
           </div>
@@ -262,7 +289,7 @@ async function loadRace(raceId) {
     
     const raceData = await fetchRaceDetails(raceId);
     currentRace = raceData.race;
-    
+
     document.getElementById('raceName').textContent = currentRace.name;
     document.getElementById('raceDescription').textContent = currentRace.description || '';
     document.getElementById('raceDuration').textContent = 
@@ -277,11 +304,23 @@ async function loadRace(raceId) {
     currentRunners = [
       ...raceData.leaderboard,
       ...raceData.non_competitive
-    ].sort((a, b) => b.total_km - a.total_km)
-     .map((runner, index) => ({
-       ...runner,
-       rank: index + 1  // Re-rank based on combined sorted list
-     }));
+    ]
+    .map(runner => {
+      const seconds = calculateTotalTimeSeconds(
+        runner.total_km,
+        runner.avg_pace
+      );
+
+      return {
+        ...runner,
+        total_time_seconds: seconds
+      };
+    })
+    .sort((a, b) => b.total_km - a.total_km)
+    .map((runner, index) => ({
+      ...runner,
+      rank: index + 1
+    }));
     
     renderLeaderboard(currentRunners);
     
@@ -320,8 +359,8 @@ function sortLeaderboard(sortType) {
         return paceA - paceB;
       });
       break;
-    case 'activities':
-      sorted.sort((a, b) => b.total_activities - a.total_activities);
+    case 'time':
+      sorted.sort((a, b) => a.total_time_seconds - b.total_time_seconds);
       break;
   }
   
