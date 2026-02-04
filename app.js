@@ -251,8 +251,8 @@ function renderActivities(activities, runnerName, stats) {
             
             <div class="grid grid-cols-3 gap-3 mt-3 pt-3 border-t border-slate-200">
               <div>
-                <div class="text-xs text-slate-500">Pace</div>
-                <div class="font-medium text-slate-700">${formatPace(activity.average_pace_min_km)}</div>
+                <div class="text-xs text-slate-500">Distance</div>
+                <div class="font-medium text-slate-700">${activity.distance_km} km</div>
               </div>
               <div>
                 <div class="text-xs text-slate-500">Avg HR</div>
