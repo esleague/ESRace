@@ -204,7 +204,7 @@ function renderTeams(teams) {
                       class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
                     />
                     <span class="flex-1 text-sm font-medium text-slate-700">${m.name}</span>
-                    <span class="text-sm text-slate-500">⚡ ${formatPaceFromMs(m.avg_pace)}</span>
+                    <span class="text-sm text-slate-500">⚡ ${formatPace(m.avg_pace)}</span>
                     <span class="text-sm font-semibold text-primary-600">${m.total_km.toFixed(2)} km</span>
                   </div>
                 `).join('')
