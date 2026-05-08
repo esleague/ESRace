@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ESRace Leaderboard</title>
   <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAALrUAADM6AAAwNsAANr3AGNj/wAI3vsAANPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAiIiIgAAAAAid3dyIAAAAidBEXdyAAACdBMzFHcgAAJ3EzMWRyAAACERERFHIAAAJ0ZmZkcgAAZmZmAAByAFVmZmYAAAIAVWYGZgAAAAAAZmZmAAAAAAAGZmAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAPgPAADwBwAA4AMAAOABAADgAQAA8AEAAPABAADgeQAAgH0AAIB/AADgfwAA8P8AAP//AAD//wAA" />
-  
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -24,27 +24,43 @@
       }
     }
   </script>
-  
+
   <style>
     @keyframes shimmer {
       0% { background-position: -1000px 0; }
       100% { background-position: 1000px 0; }
     }
-    
     .skeleton {
       background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
       background-size: 1000px 100%;
       animation: shimmer 2s infinite;
     }
-    
-    .border-3 {
-      border-width: 3px;
+    .border-3 { border-width: 3px; }
+    .sort-btn {
+      background: white;
+      color: #64748b;
     }
+    .sort-btn.active {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+    .view-tab {
+      background: white;
+      color: #64748b;
+    }
+    .view-tab.active {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+    }
+    .team-members-list { display: none; }
+    .team-members-list.open { display: block; }
   </style>
 </head>
 
 <body class="bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
-  
+
   <!-- Header -->
   <header class="bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg">
     <div class="max-w-7xl mx-auto px-4 py-6">
@@ -55,9 +71,9 @@
 
   <!-- Main Content -->
   <main class="max-w-7xl mx-auto px-4 py-8">
-    
+
     <!-- Race Selector -->
-    <div class="mb-8">
+    <div id="raceSelectorSection" class="mb-8">
       <h2 class="text-xl font-semibold text-slate-700 mb-4">📅 Select Race</h2>
       <div id="raceList" class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Race cards will be inserted here -->
@@ -66,7 +82,7 @@
 
     <!-- Race Details Section (hidden initially) -->
     <div id="raceSection" class="hidden">
-      
+
       <!-- Race Header -->
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -78,12 +94,12 @@
             ← Back to Races
           </button>
         </div>
-        
+
         <!-- Race Info Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4">
             <div class="text-sm text-blue-600 font-medium">📅 Duration</div>
-            <div id="raceDuration" class="text-lg font-bold text-blue-900 mt-1"></div>
+            <div id="raceDuration" class="text-base font-bold text-blue-900 mt-1"></div>
           </div>
           <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-4">
             <div class="text-sm text-green-600 font-medium">🏃 Participants</div>
@@ -100,12 +116,24 @@
         </div>
       </div>
 
-      <!-- Sort & Filter -->
+      <!-- Leaderboard Controls -->
       <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h3 class="text-lg font-semibold text-slate-700">🏆 Leaderboard</h3>
-          
-          <div class="flex gap-2">
+          <div class="flex items-center gap-3">
+            <h3 class="text-lg font-semibold text-slate-700">🏆 Leaderboard</h3>
+            <!-- Team/Runners tab — only shown when team_mode is on -->
+            <div id="viewTabs" class="hidden flex gap-1 bg-slate-100 rounded-lg p-1">
+              <button data-view="runners" class="view-tab active px-3 py-1 rounded-md text-sm font-medium transition">
+                🏃 Runners
+              </button>
+              <button data-view="teams" class="view-tab px-3 py-1 rounded-md text-sm font-medium transition">
+                👥 Teams
+              </button>
+            </div>
+          </div>
+
+          <!-- Sort buttons — only shown on runners tab -->
+          <div id="sortButtons" class="flex gap-2">
             <button data-sort="km" class="sort-btn active px-4 py-2 rounded-lg text-sm font-medium transition">
               📏 Distance
             </button>
@@ -116,26 +144,8 @@
         </div>
       </div>
 
-      <!-- Leaderboard Table -->
-      <div id="leaderboard" class="space-y-3">
-        <!-- Runner rows will be inserted here -->
-      </div>
-          
-          <div class="flex gap-2">
-            <button data-sort="km" class="sort-btn active px-4 py-2 rounded-lg text-sm font-medium transition">
-              📏 Distance
-            </button>
-            <button data-sort="pace" class="sort-btn px-4 py-2 rounded-lg text-sm font-medium transition">
-              ⚡ Pace
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Leaderboard -->
-      <div id="leaderboard" class="space-y-3">
-        <!-- Runner rows will be inserted here -->
-      </div>
+      <!-- Leaderboard / Teams container -->
+      <div id="leaderboard" class="space-y-3"></div>
 
     </div>
   </main>
@@ -154,7 +164,6 @@
           </svg>
         </button>
       </div>
-      
       <div id="modalContent" class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
         <!-- Activities will be inserted here -->
       </div>
