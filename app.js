@@ -5,6 +5,22 @@
 const API_BASE = 'https://esrace-backend.esrace.workers.dev/api/v1';
 
 // ==========================================
+// VIOLATION TYPE LABELS
+// ==========================================
+const TYPE_ERR_LABELS = {
+  0: 'Local rule violation',
+  1: 'Duplicate activity',
+  2: 'Invalid/incomplete data',
+  3: 'Too short',
+  4: 'Wrong activity type',
+  5: 'GPS error',
+  6: 'Daily limit exceeded',
+  7: 'Abnormal speed pattern',
+  8: 'Manual entry',
+  9: 'Speed out of range'
+};
+
+// ==========================================
 // STATE
 // ==========================================
 let currentRace = null;
@@ -107,6 +123,26 @@ function calculateTotalTimeSeconds(totalKm, avgSpeed) {
 }
 
 // ==========================================
+// VIOLATION ICON HELPER
+// ==========================================
+function renderViolationIcon(violations) {
+  if (!violations || violations.total === 0) return '';
+
+  const lines = Object.entries(violations.breakdown)
+    .map(([code, count]) => `${count} × ${TYPE_ERR_LABELS[parseInt(code)] || 'Unknown error'}`)
+    .join('\n');
+  const tooltip = `⚠ ${violations.total} invalid activit${violations.total === 1 ? 'y' : 'ies'}\n${lines}`;
+
+  return `<span class="relative inline-block ml-1 group cursor-help">
+    <span class="text-orange-400 text-xs font-bold">ⓘ</span>
+    <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block
+      bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-pre z-10 min-w-max shadow-lg">
+      ${tooltip.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+    </span>
+  </span>`;
+}
+
+// ==========================================
 // RENDERING — RUNNERS
 // ==========================================
 function renderLeaderboard(runners) {
@@ -135,7 +171,7 @@ function renderLeaderboard(runners) {
           />
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}</span>
+              <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}</span>
               ${!runner.is_competitive ? '<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">🛡️</span>' : ''}
             </div>
             <div class="text-sm text-slate-500 mt-1">⚡ ${formatPace(runner.avg_pace)}</div>
@@ -203,7 +239,7 @@ function renderTeams(teams) {
                       onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}'"
                       class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
                     />
-                    <span class="flex-1 text-sm font-medium text-slate-700">${m.name}</span>
+                    <span class="flex-1 text-sm font-medium text-slate-700">${m.name}${renderViolationIcon(m.violations)}</span>
                     <span class="text-sm text-slate-500">⚡ ${formatPace(m.avg_pace)}</span>
                     <span class="text-sm font-semibold text-primary-600">${m.total_km.toFixed(2)} km</span>
                   </div>
