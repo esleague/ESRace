@@ -143,6 +143,14 @@ function renderViolationIcon(violations) {
 }
 
 // ==========================================
+// INACTIVE BADGE HELPER
+// ==========================================
+function renderInactiveBadge(isInactive) {
+  if (!isInactive) return '';
+  return '<span class="ml-1 px-1.5 py-0.5 text-xs bg-gray-200 text-gray-600 rounded">Inactive</span>';
+}
+
+// ==========================================
 // RENDERING — RUNNERS
 // ==========================================
 function renderLeaderboard(runners) {
@@ -171,7 +179,7 @@ function renderLeaderboard(runners) {
           />
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}</span>
+              <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
               ${!runner.is_competitive ? '<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">🛡️</span>' : ''}
             </div>
             <div class="text-sm text-slate-500 mt-1">⚡ ${formatPace(runner.avg_pace)}</div>
@@ -239,7 +247,7 @@ function renderTeams(teams) {
                       onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}'"
                       class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
                     />
-                    <span class="flex-1 text-sm font-medium text-slate-700">${m.name}${renderViolationIcon(m.violations)}</span>
+                    <span class="flex-1 text-sm font-medium text-slate-700">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
                     <span class="text-sm text-slate-500">⚡ ${formatPace(m.avg_pace)}</span>
                     <span class="text-sm font-semibold text-primary-600">${m.total_km.toFixed(2)} km</span>
                   </div>
