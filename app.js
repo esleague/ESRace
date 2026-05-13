@@ -17,7 +17,8 @@ const TYPE_ERR_LABELS = {
   6: 'Daily limit exceeded',
   7: 'Abnormal speed pattern',
   8: 'Manual entry',
-  9: 'Speed out of range'
+  9: 'Speed out of range',
+  10: 'Fast lap detected'
 };
 
 // ==========================================
