@@ -127,6 +127,7 @@ function calculateTotalTimeSeconds(totalKm, avgSpeed) {
 // ==========================================
 function renderViolationIcon(violations) {
   if (!violations || violations.total === 0) return '';
+  if (!currentRace?.show_invalid_activities) return '';
 
   const lines = Object.entries(violations.breakdown)
     .map(([code, count]) => `${count} × ${TYPE_ERR_LABELS[parseInt(code)] || 'Unknown error'}`)
