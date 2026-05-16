@@ -115,7 +115,10 @@ function getRaceStatus(startTime, endTime) {
 }
 
 function getMedalIcon(rank) {
-  return rank <= 3 ? String(rank) : `#${rank}`;
+  if (rank === 1) return '<i class="fa-solid fa-trophy" style="color:#FFD43B"></i>';
+  if (rank === 2) return '<i class="fa-solid fa-medal" style="color:#ADB5BD"></i>';
+  if (rank === 3) return '<i class="fa-solid fa-medal" style="color:#CD7F32"></i>';
+  return `#${rank}`;
 }
 
 function getRankStyle(rank) {
