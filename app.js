@@ -29,7 +29,7 @@ const ICONS = {
   calendar:    '<i class="fa-solid fa-calendar-days" style="color:#74C0FC"></i>',   // sky blue — calm, organized
   distance:    '<i class="fa-solid fa-route" style="color:#CC5DE8"></i>',           // violet — journey, distance
   trophy:      '<i class="fa-solid fa-trophy" style="color:#FFD43B"></i>',          // gold — achievement
-  bolt:        '<i class="fa-solid fa-bolt" style="color:#FF922B"></i>',            // orange — speed, pace
+  bolt:        '<i class="fa-sharp fa-solid fa-bolt" style="color:#FFD43B"></i>',   // yellow sharp — speed, pace
   users:       '<i class="fa-solid fa-users" style="color:#38D9A9"></i>',           // mint — team, community
   clock:       '<i class="fa-solid fa-clock" style="color:#748FFC"></i>',           // periwinkle — time
   checkCircle: '<i class="fa-solid fa-circle-check" style="color:#51CF66"></i>',   // green — done, finished
@@ -115,10 +115,10 @@ function getRaceStatus(startTime, endTime) {
 }
 
 function getMedalIcon(rank) {
-  if (rank === 1) return '<i class="fa-solid fa-trophy" style="color:#FFD43B"></i>';
+  if (rank === 1) return '<i class="fa-solid fa-medal" style="color:#FFD43B"></i>';
   if (rank === 2) return '<i class="fa-solid fa-medal" style="color:#ADB5BD"></i>';
   if (rank === 3) return '<i class="fa-solid fa-medal" style="color:#CD7F32"></i>';
-  return `#${rank}`;
+  return String(rank);
 }
 
 function getRankStyle(rank) {
