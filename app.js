@@ -22,6 +22,26 @@ const TYPE_ERR_LABELS = {
 };
 
 // ==========================================
+// SVG ICONS
+// ==========================================
+function svgIcon(path) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.125em">${path}</svg>`;
+}
+const ICONS = {
+  runner:      svgIcon('<path d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"/>'),
+  calendar:    svgIcon('<path d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5"/>'),
+  distance:    svgIcon('<path d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5"/>'),
+  trophy:      svgIcon('<path d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"/>'),
+  bolt:        svgIcon('<path d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z"/>'),
+  users:       svgIcon('<path d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z"/>'),
+  clock:       svgIcon('<path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>'),
+  checkCircle: svgIcon('<path d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>'),
+  xCircle:     svgIcon('<path d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>'),
+  shield:      svgIcon('<path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z"/>'),
+  info:        svgIcon('<path d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"/>'),
+};
+
+// ==========================================
 // STATE
 // ==========================================
 let currentRace = null;
@@ -92,16 +112,13 @@ function formatPaceFromMs(speedMs) {
 
 function getRaceStatus(startTime, endTime) {
   const now = Date.now();
-  if (now < startTime) return '⏳ Upcoming';
-  if (now > endTime) return '✅ Finished';
-  return '🏃 Ongoing';
+  if (now < startTime) return `${ICONS.clock} Upcoming`;
+  if (now > endTime) return `${ICONS.checkCircle} Finished`;
+  return `${ICONS.runner} Ongoing`;
 }
 
 function getMedalIcon(rank) {
-  if (rank === 1) return '🥇';
-  if (rank === 2) return '🥈';
-  if (rank === 3) return '🥉';
-  return `#${rank}`;
+  return rank <= 3 ? String(rank) : `#${rank}`;
 }
 
 function getRankStyle(rank) {
@@ -136,7 +153,7 @@ function renderViolationIcon(violations) {
   const tooltip = `⚠ ${violations.total} invalid activit${violations.total === 1 ? 'y' : 'ies'}\n${lines}`;
 
   return `<span class="relative inline-block ml-1 group cursor-help">
-    <span class="text-orange-400 text-xs font-bold">ⓘ</span>
+    <span class="text-orange-400">${ICONS.info}</span>
     <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block
       bg-gray-800 text-white text-xs rounded px-2 py-1 whitespace-pre z-10 min-w-max shadow-lg">
       ${tooltip.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
@@ -182,9 +199,9 @@ function renderLeaderboard(runners) {
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
-              ${!runner.is_competitive ? '<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">🛡️</span>' : ''}
+              ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
             </div>
-            <div class="text-sm text-slate-500 mt-1">⚡ ${formatPace(runner.avg_pace)}</div>
+            <div class="text-sm text-slate-500 mt-1">${ICONS.bolt} ${formatPace(runner.avg_pace)}</div>
           </div>
           <div class="text-right flex-shrink-0">
             <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700' : 'text-primary-600'}">${runner.total_km} km</div>
@@ -224,7 +241,7 @@ function renderTeams(teams) {
           </div>
           <div class="flex-1 min-w-0">
             <div class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
-            <div class="text-sm text-slate-500 mt-1">👥 ${team.member_count} members • 🏃 ${team.total_activities} activities</div>
+            <div class="text-sm text-slate-500 mt-1">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
           </div>
           <div class="text-right flex-shrink-0 flex flex-col items-end gap-1">
             <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700' : 'text-primary-600'}">${team.total_km.toFixed(2)} km</div>
@@ -250,7 +267,7 @@ function renderTeams(teams) {
                       class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
                     />
                     <span class="flex-1 text-sm font-medium text-slate-700">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
-                    <span class="text-sm text-slate-500">⚡ ${formatPace(m.avg_pace)}</span>
+                    <span class="text-sm text-slate-500">${ICONS.bolt} ${formatPace(m.avg_pace)}</span>
                     <span class="text-sm font-semibold text-primary-600">${m.total_km.toFixed(2)} km</span>
                   </div>
                 `).join('')
@@ -310,7 +327,7 @@ async function loadRace(raceId) {
     document.getElementById('raceDuration').textContent =
       `${formatDate(currentRace.start_time)} — ${formatDate(currentRace.end_time)}`;
     document.getElementById('totalRunners').textContent = raceData.total_runners;
-    document.getElementById('raceStatus').textContent = getRaceStatus(currentRace.start_time, currentRace.end_time);
+    document.getElementById('raceStatus').innerHTML = getRaceStatus(currentRace.start_time, currentRace.end_time);
 
     const totalKm = [...raceData.leaderboard, ...raceData.non_competitive]
       .reduce((sum, r) => sum + (r.total_km || 0), 0);
@@ -348,7 +365,7 @@ async function loadRace(raceId) {
   } catch (error) {
     console.error('Error loading race:', error);
     document.getElementById('leaderboard').innerHTML =
-      '<p class="text-red-500 text-center py-8">❌ Failed to load race data</p>';
+      `<p class="text-red-500 text-center py-8">${ICONS.xCircle} Failed to load race data</p>`;
   }
 }
 
@@ -405,7 +422,7 @@ function setView(view) {
       }).catch(() => {
         if (currentView === 'teams') {
           document.getElementById('leaderboard').innerHTML =
-            '<p class="text-red-500 text-center py-8">❌ Failed to load teams</p>';
+            `<p class="text-red-500 text-center py-8">${ICONS.xCircle} Failed to load teams</p>`;
         }
       });
     } else {
@@ -516,7 +533,7 @@ async function init() {
   } catch (error) {
     console.error('Error loading races:', error);
     document.getElementById('raceList').innerHTML =
-      '<p class="text-red-500">❌ Failed to load races</p>';
+      `<p class="text-red-500">${ICONS.xCircle} Failed to load races</p>`;
   }
 }
 
@@ -539,8 +556,8 @@ function renderRaceList(races) {
         </div>
         <p class="text-sm text-slate-600 mb-3">${race.description || ''}</p>
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-xs text-slate-500">📅 ${formatDate(race.start_time)} — ${formatDate(race.end_time)}</span>
-          ${race.team_mode ? '<span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">👥 Teams</span>' : ''}
+          <span class="text-xs text-slate-500">${ICONS.calendar} ${formatDate(race.start_time)} — ${formatDate(race.end_time)}</span>
+          ${race.team_mode ? `<span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">${ICONS.users} Teams</span>` : ''}
         </div>
       </button>
     `;
