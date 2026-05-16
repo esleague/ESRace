@@ -25,17 +25,17 @@ const TYPE_ERR_LABELS = {
 // ICONS (Font Awesome 6)
 // ==========================================
 const ICONS = {
-  runner:      '<i class="fa-solid fa-person-running"></i>',
-  calendar:    '<i class="fa-solid fa-calendar-days"></i>',
-  distance:    '<i class="fa-solid fa-route"></i>',
-  trophy:      '<i class="fa-solid fa-trophy"></i>',
-  bolt:        '<i class="fa-solid fa-bolt"></i>',
-  users:       '<i class="fa-solid fa-users"></i>',
-  clock:       '<i class="fa-solid fa-clock"></i>',
-  checkCircle: '<i class="fa-solid fa-circle-check"></i>',
-  xCircle:     '<i class="fa-solid fa-circle-xmark"></i>',
-  shield:      '<i class="fa-solid fa-shield-halved"></i>',
-  info:        '<i class="fa-solid fa-circle-info"></i>',
+  runner:      '<i class="fa-solid fa-person-running" style="color:#FFD43B"></i>',  // amber — energy, movement
+  calendar:    '<i class="fa-solid fa-calendar-days" style="color:#74C0FC"></i>',   // sky blue — calm, organized
+  distance:    '<i class="fa-solid fa-route" style="color:#CC5DE8"></i>',           // violet — journey, distance
+  trophy:      '<i class="fa-solid fa-trophy" style="color:#FFD43B"></i>',          // gold — achievement
+  bolt:        '<i class="fa-solid fa-bolt" style="color:#FF922B"></i>',            // orange — speed, pace
+  users:       '<i class="fa-solid fa-users" style="color:#38D9A9"></i>',           // mint — team, community
+  clock:       '<i class="fa-solid fa-clock" style="color:#748FFC"></i>',           // periwinkle — time
+  checkCircle: '<i class="fa-solid fa-circle-check" style="color:#51CF66"></i>',   // green — done, finished
+  xCircle:     '<i class="fa-solid fa-circle-xmark" style="color:#FF6B6B"></i>',   // coral — error
+  shield:      '<i class="fa-solid fa-shield-halved" style="color:#4DABF7"></i>',  // light blue — protection
+  info:        '<i class="fa-solid fa-circle-info" style="color:#FFA94D"></i>',    // warm amber — caution
 };
 
 // ==========================================
