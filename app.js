@@ -455,8 +455,8 @@ function renderActivities(activities, runnerName, stats) {
     content.innerHTML = `
       <div class="space-y-3">
         ${activities.map(a => {
-          const invalid = !a.is_valid;
-          const reason = invalid && a.type_err != null ? (TYPE_ERR_LABELS[a.type_err] || 'Invalid') : null;
+          const invalid = !a.is_counted;
+          const reason = invalid && a.type_err != null && a.type_err !== 0 ? (TYPE_ERR_LABELS[a.type_err] || 'Invalid') : null;
           return `
           <div class="${invalid ? 'bg-red-50 border border-red-200' : 'bg-slate-50'} rounded-lg p-4 transition">
             <div class="flex items-start justify-between mb-2">
