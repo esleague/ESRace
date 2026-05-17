@@ -454,34 +454,40 @@ function renderActivities(activities, runnerName, stats) {
   } else {
     content.innerHTML = `
       <div class="space-y-3">
-        ${activities.map(a => `
-          <div class="bg-slate-50 rounded-lg p-4 hover:bg-slate-100 transition">
+        ${activities.map(a => {
+          const invalid = !a.is_valid;
+          const reason = invalid && a.type_err != null ? (TYPE_ERR_LABELS[a.type_err] || 'Invalid') : null;
+          return `
+          <div class="${invalid ? 'bg-red-50 border border-red-200' : 'bg-slate-50'} rounded-lg p-4 transition">
             <div class="flex items-start justify-between mb-2">
               <div class="flex-1">
-                <div class="font-semibold text-slate-800">${a.name}</div>
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span class="font-semibold ${invalid ? 'line-through text-slate-400' : 'text-slate-800'}">${a.name}</span>
+                  ${invalid ? `<span class="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-medium"><i class="fa-solid fa-ban"></i> ${reason}</span>` : ''}
+                </div>
                 <div class="text-sm text-slate-500 mt-1">${formatDateTime(a.start_date_formatted)}</div>
               </div>
               <div class="text-right">
-                <div class="font-bold text-primary-600">${a.distance_km} km</div>
+                <div class="font-bold ${invalid ? 'line-through text-slate-400' : 'text-primary-600'}">${a.distance_km} km</div>
                 <div class="text-xs text-slate-500">${a.moving_time_formatted}</div>
               </div>
             </div>
-            <div class="grid grid-cols-3 gap-3 mt-3 pt-3 border-t border-slate-200">
+            <div class="grid grid-cols-3 gap-3 mt-3 pt-3 border-t ${invalid ? 'border-red-200' : 'border-slate-200'}">
               <div>
                 <div class="text-xs text-slate-500">Distance</div>
-                <div class="font-medium text-slate-700">${a.distance_km} km</div>
+                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700'}">${a.distance_km} km</div>
               </div>
               <div>
                 <div class="text-xs text-slate-500">Avg HR</div>
-                <div class="font-medium text-slate-700">${a.average_heartrate || '-'} bpm</div>
+                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700'}">${a.average_heartrate || '-'} bpm</div>
               </div>
               <div>
                 <div class="text-xs text-slate-500">Pace</div>
-                <div class="font-medium text-slate-700">${formatPaceFromMs(a.average_speed_ms)}</div>
+                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700'}">${formatPaceFromMs(a.average_speed_ms)}</div>
               </div>
             </div>
           </div>
-        `).join('')}
+        `}).join('')}
       </div>
     `;
   }
