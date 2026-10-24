@@ -170,6 +170,193 @@ function renderInactiveBadge(isInactive) {
 }
 
 // ==========================================
+// GOAL PROGRESS HELPERS
+// ==========================================
+function getGoalColor(percent) {
+  if (percent >= 100) return '#8b5cf6'; // purple — achieved/exceeded
+  if (percent >= 75) return '#22c55e';  // green — almost there
+  if (percent >= 50) return '#f59e0b';  // amber — halfway, exciting
+  if (percent >= 25) return '#22d3ee';  // cyan — building momentum
+  return '#60a5fa';                      // blue — just started
+}
+
+function getGoalTextColor(percent) {
+  if (percent >= 100) return 'text-purple-600';
+  if (percent >= 75) return 'text-green-600';
+  if (percent >= 50) return 'text-amber-600';
+  if (percent >= 25) return 'text-cyan-600';
+  return 'text-blue-500';
+}
+
+function renderProgressBar(percent, totalKm, goalKm) {
+  const barWidth = Math.min(percent, 100);
+  const color = getGoalColor(percent);
+  const exceeded = percent >= 100;
+
+  return `
+    <div class="mt-2">
+      <div class="flex items-center justify-between mb-1">
+        <span class="text-sm font-medium text-slate-600">${totalKm.toFixed(2)} / ${goalKm} km</span>
+        <span class="text-sm font-bold ${getGoalTextColor(percent)}">${percent.toFixed(1)}%${exceeded ? ' ✓' : ''}</span>
+      </div>
+      <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+        <div class="h-full rounded-full transition-all duration-500" style="width: ${barWidth}%; background-color: ${color};"></div>
+      </div>
+    </div>
+  `;
+}
+
+// ==========================================
+// RENDERING — RUNNERS (GOAL VIEW)
+// ==========================================
+function renderGoalLeaderboard(runners) {
+  const container = document.getElementById('leaderboard');
+
+  const withGoal = runners.filter(r => r.goal != null);
+  const withoutGoal = runners.filter(r => r.goal == null);
+
+  withGoal.sort((a, b) => (b.goal_progress || 0) - (a.goal_progress || 0));
+  const sorted = [...withGoal, ...withoutGoal].map((r, i) => ({ ...r, rank: i + 1 }));
+
+  if (sorted.length === 0) {
+    container.innerHTML = '<p class="text-slate-500 text-center py-8">No runners yet</p>';
+    return;
+  }
+
+  container.innerHTML = sorted.map(runner => {
+    const isTopThree = runner.rank <= 3;
+    const hasGoal = runner.goal != null;
+    const percent = runner.goal_progress || 0;
+
+    return `
+      <div class="hover:shadow-xl transition-all duration-300 rounded-xl p-4 border-3 ${getRankStyle(runner.rank)}">
+        <div class="flex items-center gap-4">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 rounded-full ${getRankCircleStyle(runner.rank)} flex items-center justify-center border-2">
+              <span class="font-bold text-lg">${getMedalIcon(runner.rank)}</span>
+            </div>
+          </div>
+          <img
+            src="${runner.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(runner.name)}"
+            alt="${runner.name}"
+            onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(runner.name)}'"
+            class="w-14 h-14 rounded-full object-cover border-3 ${isTopThree ? 'border-primary-400' : 'border-slate-300'} flex-shrink-0"
+          />
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
+              ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
+            </div>
+            ${hasGoal
+              ? renderProgressBar(percent, runner.total_km, runner.goal)
+              : '<div class="mt-1 text-sm text-slate-400">No goal set</div>'
+            }
+          </div>
+          <div class="text-right flex-shrink-0">
+            <button
+              onclick="showActivities('${currentRace.id}', '${runner.myvne_id}', '${runner.name.replace(/'/g, "\\'")}')"
+              class="text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
+            >View details →</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==========================================
+// RENDERING — TEAMS (GOAL VIEW)
+// ==========================================
+function renderGoalTeams(teams) {
+  const container = document.getElementById('leaderboard');
+
+  if (!teams || teams.length === 0) {
+    container.innerHTML = '<p class="text-slate-500 text-center py-8">No teams yet</p>';
+    return;
+  }
+
+  const teamsWithGoal = teams.map(team => {
+    const teamGoal = team.members.reduce((sum, m) => sum + (m.goal || 0), 0);
+    const teamKm = team.members.reduce((sum, m) => sum + (m.total_km || 0), 0);
+    const teamProgress = teamGoal > 0 ? (teamKm / teamGoal) * 100 : null;
+    return { ...team, team_goal: teamGoal, team_km: teamKm, team_progress: teamProgress };
+  });
+
+  const withGoal = teamsWithGoal.filter(t => t.team_goal > 0);
+  const withoutGoal = teamsWithGoal.filter(t => t.team_goal === 0);
+  withGoal.sort((a, b) => (b.team_progress || 0) - (a.team_progress || 0));
+  const sorted = [...withGoal, ...withoutGoal];
+
+  container.innerHTML = sorted.map((team, index) => {
+    const rank = index + 1;
+    const isTopThree = rank <= 3;
+    const hasGoal = team.team_goal > 0;
+    const percent = team.team_progress || 0;
+
+    return `
+      <div class="hover:shadow-xl transition-all duration-300 rounded-xl border-3 ${getRankStyle(rank)} overflow-hidden">
+        <div class="flex items-center gap-4 p-4">
+          <div class="flex-shrink-0">
+            <div class="w-12 h-12 rounded-full ${getRankCircleStyle(rank)} flex items-center justify-center border-2">
+              <span class="font-bold text-lg">${getMedalIcon(rank)}</span>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
+            <div class="text-sm text-slate-500 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
+            ${hasGoal
+              ? renderProgressBar(percent, team.team_km, team.team_goal)
+              : '<div class="mt-1 text-sm text-slate-400">No goal set</div>'
+            }
+          </div>
+          <div class="text-right flex-shrink-0">
+            <button
+              onclick="toggleTeamMembers('${team.team_id}')"
+              class="text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
+            >Members ▾</button>
+          </div>
+        </div>
+        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 bg-slate-50 px-4 py-3 space-y-3">
+          ${team.members.length === 0
+            ? '<p class="text-sm text-slate-400">No members</p>'
+            : team.members
+                .slice()
+                .sort((a, b) => (b.goal_progress || 0) - (a.goal_progress || 0))
+                .map((m, i) => {
+                  const mHasGoal = m.goal != null;
+                  const mPercent = m.goal_progress || 0;
+                  return `
+                    <div class="flex items-center gap-3">
+                      <span class="text-xs text-slate-400 w-4">${i + 1}</span>
+                      <img
+                        src="${m.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name)}"
+                        onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}'"
+                        class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
+                      />
+                      <div class="flex-1 min-w-0">
+                        <span class="text-sm font-medium text-slate-700">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
+                        ${mHasGoal
+                          ? `<div class="flex items-center gap-2 mt-1">
+                              <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
+                                <div class="h-full rounded-full" style="width: ${Math.min(mPercent, 100)}%; background-color: ${getGoalColor(mPercent)};"></div>
+                              </div>
+                              <span class="text-xs font-semibold ${getGoalTextColor(mPercent)}">${mPercent.toFixed(1)}%</span>
+                            </div>`
+                          : '<div class="text-xs text-slate-400">No goal</div>'
+                        }
+                      </div>
+                      <span class="text-sm font-semibold text-primary-600">${m.total_km.toFixed(2)} km</span>
+                    </div>
+                  `;
+                }).join('')
+          }
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==========================================
 // RENDERING — RUNNERS
 // ==========================================
 function renderLeaderboard(runners) {
@@ -342,11 +529,14 @@ async function loadRace(raceId) {
       .sort((a, b) => b.total_km - a.total_km)
       .map((runner, i) => ({ ...runner, rank: i + 1 }));
 
+    // Show/hide goal sort button
+    const goalSortBtn = document.getElementById('goalSortBtn');
+    goalSortBtn.style.display = currentRace.has_goal ? '' : 'none';
+
     // Show/hide team tab
     const viewTabs = document.getElementById('viewTabs');
     if (currentRace.team_mode) {
       viewTabs.classList.remove('hidden');
-      // Fetch teams then show teams tab by default
       try {
         currentTeams = await fetchTeams(raceId);
       } catch {
@@ -382,35 +572,55 @@ async function showActivities(raceId, myvneId, runnerName) {
 function sortLeaderboard(sortType) {
   currentSort = sortType;
 
-  const sorted = [...currentRunners];
-  if (sortType === 'km') {
-    sorted.sort((a, b) => b.total_km - a.total_km);
-  } else if (sortType === 'pace') {
-    sorted.sort((a, b) => (parseFloat(a.avg_pace) || Infinity) - (parseFloat(b.avg_pace) || Infinity));
+  if (sortType === 'goal') {
+    if (currentView === 'runners') {
+      renderGoalLeaderboard(currentRunners);
+    } else {
+      renderGoalTeams(currentTeams);
+    }
+  } else if (currentView === 'runners') {
+    const sorted = [...currentRunners];
+    if (sortType === 'km') {
+      sorted.sort((a, b) => b.total_km - a.total_km);
+    } else if (sortType === 'pace') {
+      sorted.sort((a, b) => (parseFloat(a.avg_pace) || Infinity) - (parseFloat(b.avg_pace) || Infinity));
+    }
+    currentRunners = sorted.map((runner, i) => ({ ...runner, rank: i + 1 }));
+    renderLeaderboard(currentRunners);
+  } else {
+    renderTeams(currentTeams);
   }
 
-  currentRunners = sorted.map((runner, i) => ({ ...runner, rank: i + 1 }));
-  renderLeaderboard(currentRunners);
-
   document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
-  document.querySelector(`[data-sort="${sortType}"]`).classList.add('active');
+  document.querySelector(`[data-sort="${sortType}"]`)?.classList.add('active');
 }
 
 function setView(view) {
   currentView = view;
   const sortButtons = document.getElementById('sortButtons');
+  const paceBtn = document.querySelector('[data-sort="pace"]');
 
   document.querySelectorAll('.view-tab').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.view === view);
   });
 
+  sortButtons.classList.remove('hidden');
+
   if (view === 'runners') {
-    sortButtons.classList.remove('hidden');
-    renderLeaderboard(currentRunners);
+    paceBtn.style.display = '';
+    if (currentSort === 'goal') {
+      renderGoalLeaderboard(currentRunners);
+    } else {
+      renderLeaderboard(currentRunners);
+    }
   } else {
-    sortButtons.classList.add('hidden');
+    paceBtn.style.display = 'none';
+    if (currentSort === 'pace') {
+      currentSort = 'km';
+      document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('[data-sort="km"]').classList.add('active');
+    }
     if (currentTeams.length === 0) {
-      // Teams may still be loading — show skeleton then render when ready
       document.getElementById('leaderboard').innerHTML = `
         <div class="space-y-3">
           ${Array(3).fill(0).map(() => '<div class="bg-white rounded-xl p-4 skeleton h-20"></div>').join('')}
@@ -418,7 +628,10 @@ function setView(view) {
       `;
       fetchTeams(currentRace.id).then(teams => {
         currentTeams = teams || [];
-        if (currentView === 'teams') renderTeams(currentTeams);
+        if (currentView === 'teams') {
+          if (currentSort === 'goal') renderGoalTeams(currentTeams);
+          else renderTeams(currentTeams);
+        }
       }).catch(() => {
         if (currentView === 'teams') {
           document.getElementById('leaderboard').innerHTML =
@@ -426,7 +639,8 @@ function setView(view) {
         }
       });
     } else {
-      renderTeams(currentTeams);
+      if (currentSort === 'goal') renderGoalTeams(currentTeams);
+      else renderTeams(currentTeams);
     }
   }
 }
