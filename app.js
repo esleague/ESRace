@@ -172,35 +172,66 @@ function renderInactiveBadge(isInactive) {
 // ==========================================
 // GOAL PROGRESS HELPERS
 // ==========================================
+function getGoalTier(percent) {
+  if (percent >= 300) return {
+    gradient: 'linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6, #f97316, #eab308)',
+    textClass: 'text-amber-700', badgeText: '👑 LEGEND',
+    badgeCls: 'bg-amber-100 text-amber-700',
+    glowClass: 'glow-gold', shimmerClass: 'bar-shimmer-intense',
+  };
+  if (percent >= 250) return {
+    gradient: 'linear-gradient(90deg, #2563eb, #7c3aed, #ef4444, #f97316)',
+    textClass: 'text-red-600', badgeText: '🔥 2.5x',
+    badgeCls: 'bg-red-100 text-red-600',
+    glowClass: 'glow-red', shimmerClass: 'bar-shimmer',
+  };
+  if (percent >= 200) return {
+    gradient: 'linear-gradient(90deg, #f59e0b, #f97316, #ef4444)',
+    textClass: 'text-orange-600', badgeText: '⚡ 2x',
+    badgeCls: 'bg-orange-100 text-orange-600',
+    glowClass: 'glow-fire', shimmerClass: 'bar-shimmer',
+  };
+  if (percent >= 150) return {
+    gradient: 'linear-gradient(90deg, #14b8a6, #3b82f6, #6366f1)',
+    textClass: 'text-blue-600', badgeText: '💪 1.5x',
+    badgeCls: 'bg-blue-100 text-blue-600',
+    glowClass: 'glow-blue', shimmerClass: '',
+  };
+  if (percent >= 100) return {
+    gradient: 'linear-gradient(90deg, #059669, #14b8a6)',
+    textClass: 'text-emerald-600', badgeText: '✓',
+    badgeCls: 'bg-emerald-100 text-emerald-600',
+    glowClass: '', shimmerClass: '',
+  };
+  if (percent >= 75) return { gradient: '#16a34a', textClass: 'text-green-600', badgeText: '', badgeCls: '', glowClass: '', shimmerClass: '' };
+  if (percent >= 50) return { gradient: '#d97706', textClass: 'text-amber-600', badgeText: '', badgeCls: '', glowClass: '', shimmerClass: '' };
+  if (percent >= 25) return { gradient: '#0891b2', textClass: 'text-cyan-600', badgeText: '', badgeCls: '', glowClass: '', shimmerClass: '' };
+  return { gradient: '#3b82f6', textClass: 'text-blue-500', badgeText: '', badgeCls: '', glowClass: '', shimmerClass: '' };
+}
+
 function getGoalColor(percent) {
-  if (percent >= 100) return '#8b5cf6'; // purple — achieved/exceeded
-  if (percent >= 75) return '#22c55e';  // green — almost there
-  if (percent >= 50) return '#f59e0b';  // amber — halfway, exciting
-  if (percent >= 25) return '#22d3ee';  // cyan — building momentum
-  return '#60a5fa';                      // blue — just started
+  return getGoalTier(percent).gradient;
 }
 
 function getGoalTextColor(percent) {
-  if (percent >= 100) return 'text-purple-600';
-  if (percent >= 75) return 'text-green-600';
-  if (percent >= 50) return 'text-amber-600';
-  if (percent >= 25) return 'text-cyan-600';
-  return 'text-blue-500';
+  return getGoalTier(percent).textClass;
 }
 
 function renderProgressBar(percent, totalKm, goalKm) {
   const barWidth = Math.min(percent, 100);
-  const color = getGoalColor(percent);
-  const exceeded = percent >= 100;
+  const tier = getGoalTier(percent);
+  const badge = tier.badgeText
+    ? ` <span class="text-xs font-bold px-1.5 py-0.5 rounded ${tier.badgeCls}">${tier.badgeText}</span>`
+    : '';
 
   return `
     <div class="mt-2">
       <div class="flex items-center justify-between mb-1">
         <span class="text-sm font-medium text-slate-600">${totalKm.toFixed(2)} / ${goalKm} km</span>
-        <span class="text-sm font-bold ${getGoalTextColor(percent)}">${percent.toFixed(1)}%${exceeded ? ' ✓' : ''}</span>
+        <span class="text-sm font-bold ${tier.textClass}">${percent.toFixed(1)}%${badge}</span>
       </div>
-      <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-        <div class="h-full rounded-full transition-all duration-500" style="width: ${barWidth}%; background-color: ${color};"></div>
+      <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden ${tier.glowClass}">
+        <div class="h-full rounded-full transition-all duration-500 relative overflow-hidden ${tier.shimmerClass}" style="width: ${barWidth}%; background: ${tier.gradient};"></div>
       </div>
     </div>
   `;
@@ -338,7 +369,7 @@ function renderGoalTeams(teams) {
                         ${mHasGoal
                           ? `<div class="flex items-center gap-2 mt-1">
                               <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
-                                <div class="h-full rounded-full" style="width: ${Math.min(mPercent, 100)}%; background-color: ${getGoalColor(mPercent)};"></div>
+                                <div class="h-full rounded-full" style="width: ${Math.min(mPercent, 100)}%; background: ${getGoalColor(mPercent)};"></div>
                               </div>
                               <span class="text-xs font-semibold ${getGoalTextColor(mPercent)}">${mPercent.toFixed(1)}%</span>
                             </div>`
