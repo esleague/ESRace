@@ -437,7 +437,7 @@ function renderLeaderboard(runners) {
               <span class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
               ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
             </div>
-            <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">${ICONS.bolt} ${formatPace(runner.avg_pace)}</div>
+            <div class="text-sm text-slate-500 dark:text-slate-300 mt-1">${ICONS.bolt} ${formatPace(runner.avg_pace)}</div>
           </div>
           <div class="text-right flex-shrink-0">
             <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${runner.total_km} km</div>
