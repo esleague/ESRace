@@ -239,7 +239,7 @@ function renderProgressBar(percent, totalKm, goalKm) {
   const barWidth = Math.min(percent, 100);
   const tier = getGoalTier(percent);
   const badge = tier.badgeText
-    ? ` <span class="text-xs font-bold px-1.5 py-0.5 rounded ${tier.badgeCls}">${tier.badgeText}</span>`
+    ? ` <span class="text-sm font-bold px-1.5 py-0.5 rounded ${tier.badgeCls}">${tier.badgeText}</span>`
     : '';
 
   return `
