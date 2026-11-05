@@ -717,11 +717,12 @@ function renderActivities(activities, runnerName, stats) {
   } else {
     content.innerHTML = `
       <div class="space-y-3">
-        ${activities.map(a => {
+        ${activities.map((a, idx) => {
           const invalid = !a.is_counted;
           const reason = invalid && a.type_err != null && a.type_err !== 0 ? (TYPE_ERR_LABELS[a.type_err] || 'Invalid') : null;
+          const zebra = !invalid && idx % 2 === 1 ? 'bg-slate-100 dark:bg-[#252d3d]' : 'bg-slate-50 dark:bg-[#1c2230]/60';
           return `
-          <div class="${invalid ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40' : 'bg-slate-50 dark:bg-[#1c2230]/60'} rounded-lg p-4 transition">
+          <div class="${invalid ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40' : zebra} rounded-lg p-4 transition">
             <div class="flex items-start justify-between mb-2">
               <div class="flex-1">
                 <div class="flex items-center gap-2 flex-wrap">
