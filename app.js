@@ -245,7 +245,7 @@ function renderProgressBar(percent, totalKm, goalKm) {
   return `
     <div class="mt-2">
       <div class="flex items-center justify-between mb-1">
-        <span class="text-sm font-medium text-slate-600 dark:text-slate-400">${totalKm.toFixed(2)} / ${goalKm} km</span>
+        <span class="text-sm font-medium text-slate-600 dark:text-slate-300">${totalKm.toFixed(2)} / ${goalKm} km</span>
         <span class="text-sm font-bold ${tier.textClass}">${percent.toFixed(1)}%${badge}</span>
       </div>
       <div class="w-full bg-slate-200 dark:bg-[#151921] rounded-full h-3 overflow-hidden ${tier.glowClass}">
