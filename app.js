@@ -352,7 +352,7 @@ function renderGoalTeams(teams) {
           </div>
           <div class="flex-1 min-w-0">
             <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
-            <div class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
+            <div class="text-sm text-slate-500 dark:text-slate-300 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
             ${hasGoal
               ? renderProgressBar(percent, team.team_km, team.team_goal)
               : '<div class="mt-1 text-sm text-slate-400">No goal set</div>'
