@@ -1,4 +1,22 @@
 // ==========================================
+// THEME
+// ==========================================
+function initTheme() {
+  const saved = localStorage.getItem('esrace-theme');
+  const isDark = saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.classList.toggle('dark', isDark);
+  const toggle = document.getElementById('themeToggle');
+  if (toggle) toggle.setAttribute('aria-checked', String(isDark));
+}
+initTheme();
+
+document.getElementById('themeToggle')?.addEventListener('click', () => {
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('esrace-theme', isDark ? 'dark' : 'light');
+  document.getElementById('themeToggle').setAttribute('aria-checked', String(isDark));
+});
+
+// ==========================================
 // CONFIG
 // ==========================================
 // const API_BASE = 'http://localhost:8787/api/v1';
@@ -122,17 +140,17 @@ function getMedalIcon(rank) {
 }
 
 function getRankStyle(rank) {
-  if (rank === 1) return 'border-yellow-400 bg-yellow-50 shadow-lg';
-  if (rank === 2) return 'border-slate-400 bg-slate-50 shadow-lg';
-  if (rank === 3) return 'border-orange-400 bg-orange-50 shadow-lg';
-  return 'border-slate-200 bg-white';
+  if (rank === 1) return 'border-yellow-400 bg-yellow-50 dark:bg-[#1f2318] shadow-lg';
+  if (rank === 2) return 'border-slate-400 bg-slate-50 dark:bg-[#1c2230] shadow-lg';
+  if (rank === 3) return 'border-orange-400 bg-orange-50 dark:bg-[#211e18] shadow-lg';
+  return 'border-slate-200 dark:border-[#2a3244] bg-white dark:bg-[#1c2230]';
 }
 
 function getRankCircleStyle(rank) {
-  if (rank === 1) return 'bg-gradient-to-br from-yellow-100 to-yellow-200 border-yellow-400 text-yellow-800';
-  if (rank === 2) return 'bg-gradient-to-br from-slate-100 to-slate-200 border-slate-400 text-slate-800';
-  if (rank === 3) return 'bg-gradient-to-br from-orange-100 to-orange-200 border-orange-400 text-orange-800';
-  return 'bg-slate-100 border-slate-300 text-slate-600';
+  if (rank === 1) return 'bg-gradient-to-br from-yellow-100 to-yellow-200 dark:from-yellow-900/20 dark:to-yellow-800/20 border-yellow-400 text-yellow-800 dark:text-yellow-300';
+  if (rank === 2) return 'bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700/20 dark:to-slate-600/20 border-slate-400 text-slate-800 dark:text-slate-300';
+  if (rank === 3) return 'bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-900/20 dark:to-orange-800/20 border-orange-400 text-orange-800 dark:text-orange-300';
+  return 'bg-slate-100 dark:bg-[#252d3d] border-slate-300 dark:border-[#333d50] text-slate-600 dark:text-slate-500';
 }
 
 function calculateTotalTimeSeconds(totalKm, avgSpeed) {
@@ -227,10 +245,10 @@ function renderProgressBar(percent, totalKm, goalKm) {
   return `
     <div class="mt-2">
       <div class="flex items-center justify-between mb-1">
-        <span class="text-sm font-medium text-slate-600">${totalKm.toFixed(2)} / ${goalKm} km</span>
+        <span class="text-sm font-medium text-slate-600 dark:text-slate-400">${totalKm.toFixed(2)} / ${goalKm} km</span>
         <span class="text-sm font-bold ${tier.textClass}">${percent.toFixed(1)}%${badge}</span>
       </div>
-      <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden ${tier.glowClass}">
+      <div class="w-full bg-slate-200 dark:bg-[#151921] rounded-full h-3 overflow-hidden ${tier.glowClass}">
         <div class="h-full rounded-full transition-all duration-500 relative overflow-hidden ${tier.shimmerClass}" style="width: ${barWidth}%; background: ${tier.gradient};"></div>
       </div>
     </div>
@@ -250,7 +268,7 @@ function renderGoalLeaderboard(runners) {
   const sorted = [...withGoal, ...withoutGoal].map((r, i) => ({ ...r, rank: i + 1 }));
 
   if (sorted.length === 0) {
-    container.innerHTML = '<p class="text-slate-500 text-center py-8">No runners yet</p>';
+    container.innerHTML = '<p class="text-slate-500 dark:text-slate-400 text-center py-8">No runners yet</p>';
     return;
   }
 
@@ -275,7 +293,7 @@ function renderGoalLeaderboard(runners) {
           />
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
               ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
             </div>
             ${hasGoal
@@ -333,8 +351,8 @@ function renderGoalTeams(teams) {
             </div>
           </div>
           <div class="flex-1 min-w-0">
-            <div class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
-            <div class="text-sm text-slate-500 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
+            <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
             ${hasGoal
               ? renderProgressBar(percent, team.team_km, team.team_goal)
               : '<div class="mt-1 text-sm text-slate-400">No goal set</div>'
@@ -347,7 +365,7 @@ function renderGoalTeams(teams) {
             >Members ▾</button>
           </div>
         </div>
-        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 bg-slate-50 px-4 py-3 space-y-3">
+        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-4 py-3 space-y-3">
           ${team.members.length === 0
             ? '<p class="text-sm text-slate-400">No members</p>'
             : team.members
@@ -365,7 +383,7 @@ function renderGoalTeams(teams) {
                         class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
                       />
                       <div class="flex-1 min-w-0">
-                        <span class="text-sm font-medium text-slate-700">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
+                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
                         ${mHasGoal
                           ? `<div class="flex items-center gap-2 mt-1">
                               <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
@@ -394,7 +412,7 @@ function renderLeaderboard(runners) {
   const container = document.getElementById('leaderboard');
 
   if (!runners || runners.length === 0) {
-    container.innerHTML = '<p class="text-slate-500 text-center py-8">No runners yet</p>';
+    container.innerHTML = '<p class="text-slate-500 dark:text-slate-400 text-center py-8">No runners yet</p>';
     return;
   }
 
@@ -416,13 +434,13 @@ function renderLeaderboard(runners) {
           />
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
+              <span class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
               ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
             </div>
-            <div class="text-sm text-slate-500 mt-1">${ICONS.bolt} ${formatPace(runner.avg_pace)}</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400 mt-1">${ICONS.bolt} ${formatPace(runner.avg_pace)}</div>
           </div>
           <div class="text-right flex-shrink-0">
-            <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700' : 'text-primary-600'}">${runner.total_km} km</div>
+            <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${runner.total_km} km</div>
             <button
               onclick="showActivities('${currentRace.id}', '${runner.myvne_id}', '${runner.name.replace(/'/g, "\\'")}')"
               class="text-sm text-primary-600 hover:text-primary-800 font-medium mt-1 hover:underline"
@@ -458,11 +476,11 @@ function renderTeams(teams) {
             </div>
           </div>
           <div class="flex-1 min-w-0">
-            <div class="font-semibold text-slate-800 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
+            <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
             <div class="text-sm text-slate-500 mt-1">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
           </div>
           <div class="text-right flex-shrink-0 flex flex-col items-end gap-1">
-            <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700' : 'text-primary-600'}">${team.total_km.toFixed(2)} km</div>
+            <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${team.total_km.toFixed(2)} km</div>
             <button
               onclick="toggleTeamMembers('${team.team_id}')"
               class="text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
@@ -470,7 +488,7 @@ function renderTeams(teams) {
           </div>
         </div>
         <!-- Expandable member list -->
-        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 bg-slate-50 px-4 py-3 space-y-2">
+        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-4 py-3 space-y-2">
           ${team.members.length === 0
             ? '<p class="text-sm text-slate-400">No members</p>'
             : team.members
@@ -530,7 +548,7 @@ async function loadRace(raceId) {
     document.querySelector(`.race-card[onclick="loadRace('${raceId}')"]`)?.classList.add('border-primary-500', 'shadow-md');
     document.getElementById('leaderboard').innerHTML = `
       <div class="space-y-3">
-        ${Array(5).fill(0).map(() => '<div class="bg-white rounded-xl p-4 skeleton h-20"></div>').join('')}
+        ${Array(5).fill(0).map(() => '<div class="bg-white dark:bg-[#1c2230] rounded-xl p-4 skeleton h-20"></div>').join('')}
       </div>
     `;
 
@@ -654,7 +672,7 @@ function setView(view) {
     if (currentTeams.length === 0) {
       document.getElementById('leaderboard').innerHTML = `
         <div class="space-y-3">
-          ${Array(3).fill(0).map(() => '<div class="bg-white rounded-xl p-4 skeleton h-20"></div>').join('')}
+          ${Array(3).fill(0).map(() => '<div class="bg-white dark:bg-[#1c2230] rounded-xl p-4 skeleton h-20"></div>').join('')}
         </div>
       `;
       fetchTeams(currentRace.id).then(teams => {
@@ -703,32 +721,32 @@ function renderActivities(activities, runnerName, stats) {
           const invalid = !a.is_counted;
           const reason = invalid && a.type_err != null && a.type_err !== 0 ? (TYPE_ERR_LABELS[a.type_err] || 'Invalid') : null;
           return `
-          <div class="${invalid ? 'bg-red-50 border border-red-200' : 'bg-slate-50'} rounded-lg p-4 transition">
+          <div class="${invalid ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40' : 'bg-slate-50 dark:bg-[#1c2230]/60'} rounded-lg p-4 transition">
             <div class="flex items-start justify-between mb-2">
               <div class="flex-1">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span class="font-semibold ${invalid ? 'line-through text-slate-400' : 'text-slate-800'}">${a.name}</span>
+                  <span class="font-semibold ${invalid ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'}">${a.name}</span>
                   ${invalid ? `<span class="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-medium"><i class="fa-solid fa-ban"></i> ${reason}</span>` : ''}
                 </div>
                 <div class="text-sm text-slate-500 mt-1">${formatDateTime(a.start_date_formatted)}</div>
               </div>
               <div class="text-right">
-                <div class="font-bold ${invalid ? 'line-through text-slate-400' : 'text-primary-600'}">${a.distance_km} km</div>
-                <div class="text-xs text-slate-500">${a.moving_time_formatted}</div>
+                <div class="font-bold ${invalid ? 'line-through text-slate-400' : 'text-primary-600 dark:text-slate-300'}">${a.distance_km} km</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">${a.moving_time_formatted}</div>
               </div>
             </div>
-            <div class="grid grid-cols-3 gap-3 mt-3 pt-3 border-t ${invalid ? 'border-red-200' : 'border-slate-200'}">
+            <div class="grid grid-cols-3 gap-3 mt-3 pt-3 border-t ${invalid ? 'border-red-200 dark:border-red-800' : 'border-slate-200 dark:border-slate-600'}">
               <div>
-                <div class="text-xs text-slate-500">Distance</div>
-                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700'}">${a.distance_km} km</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Distance</div>
+                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${a.distance_km} km</div>
               </div>
               <div>
-                <div class="text-xs text-slate-500">Avg HR</div>
-                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700'}">${a.average_heartrate || '-'} bpm</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Avg HR</div>
+                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${a.average_heartrate || '-'} bpm</div>
               </div>
               <div>
-                <div class="text-xs text-slate-500">Pace</div>
-                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700'}">${formatPaceFromMs(a.average_speed_ms)}</div>
+                <div class="text-xs text-slate-500 dark:text-slate-400">Pace</div>
+                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${formatPaceFromMs(a.average_speed_ms)}</div>
               </div>
             </div>
           </div>
@@ -799,15 +817,15 @@ function renderRaceList(races) {
     return `
       <button
         onclick="loadRace('${race.id}')"
-        class="race-card bg-white hover:shadow-xl transition-all duration-300 rounded-xl p-6 text-left border-2 border-transparent hover:border-primary-500"
+        class="race-card bg-white dark:bg-[#1c2230] hover:shadow-xl transition-all duration-300 rounded-xl p-6 text-left border-2 border-transparent hover:border-primary-500"
       >
         <div class="flex items-center justify-between mb-2">
-          <h3 class="font-bold text-lg text-slate-800">${race.name}</h3>
-          <span class="text-xs px-2 py-1 rounded-full bg-slate-100">${status}</span>
+          <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">${race.name}</h3>
+          <span class="text-xs px-2 py-1 rounded-full bg-slate-100 dark:bg-[#252d3d] dark:text-slate-400">${status}</span>
         </div>
-        <p class="text-sm text-slate-600 mb-3">${race.description || ''}</p>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-3">${race.description || ''}</p>
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="text-xs text-slate-500">${ICONS.calendar} ${formatDate(race.start_time)} — ${formatDate(race.end_time)}</span>
+          <span class="text-xs text-slate-500 dark:text-slate-400">${ICONS.calendar} ${formatDate(race.start_time)} — ${formatDate(race.end_time)}</span>
           ${race.team_mode ? `<span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">${ICONS.users} Teams</span>` : ''}
         </div>
       </button>
