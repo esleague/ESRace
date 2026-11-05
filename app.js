@@ -140,10 +140,10 @@ function getMedalIcon(rank) {
 }
 
 function getRankStyle(rank) {
-  if (rank === 1) return 'border-yellow-400 bg-yellow-50 dark:bg-[#1f2318] shadow-lg';
-  if (rank === 2) return 'border-slate-400 bg-slate-50 dark:bg-[#1c2230] shadow-lg';
-  if (rank === 3) return 'border-orange-400 bg-orange-50 dark:bg-[#211e18] shadow-lg';
-  return 'border-slate-200 dark:border-[#2a3244] bg-white dark:bg-[#1c2230]';
+  if (rank === 1) return 'border-yellow-400 bg-yellow-50 dark:bg-[#2a2618] dark:shadow-[0_0_15px_rgba(250,204,21,0.12)] shadow-lg';
+  if (rank === 2) return 'border-slate-400 bg-slate-50 dark:bg-[#242a35] dark:shadow-[0_0_12px_rgba(148,163,184,0.1)] shadow-lg';
+  if (rank === 3) return 'border-orange-400 bg-orange-50 dark:bg-[#2a2218] dark:shadow-[0_0_12px_rgba(249,115,22,0.1)] shadow-lg';
+  return 'border-slate-200 dark:border-[#2a3244] bg-white dark:bg-[#212838]';
 }
 
 function getRankCircleStyle(rank) {
