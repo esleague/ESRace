@@ -194,10 +194,10 @@
 
   <!-- Header -->
   <header class="bg-gradient-to-r from-primary-600 to-primary-700 dark:from-[#1c2230] dark:to-[#151921] text-white shadow-lg transition-colors duration-500">
-    <div class="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-6 flex items-center justify-between gap-3">
       <div>
-        <h1 class="text-3xl font-bold"><i class="fa-solid fa-person-running" style="color:#FFD43B"></i> ESRace Leaderboard</h1>
-        <p class="text-primary-100 dark:text-slate-400 text-sm mt-1">Track your running achievements</p>
+        <h1 class="text-xl sm:text-3xl font-bold"><i class="fa-solid fa-person-running" style="color:#FFD43B"></i> ESRace Leaderboard</h1>
+        <p class="text-primary-100 dark:text-slate-400 text-xs sm:text-sm mt-1 hidden sm:block">Track your running achievements</p>
       </div>
       <button id="themeToggle" class="theme-toggle" role="switch" aria-checked="false" aria-label="Toggle dark mode">
         <div class="toggle-stars">
@@ -215,7 +215,7 @@
   </header>
 
   <!-- Main Content -->
-  <main class="max-w-7xl mx-auto px-4 py-8">
+  <main class="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8">
 
     <!-- Race Selector -->
     <div id="raceSelectorSection" class="mb-8">
@@ -229,10 +229,10 @@
     <div id="raceSection" class="hidden">
 
       <!-- Race Header -->
-      <div class="bg-white dark:bg-[#1c2230] rounded-2xl shadow-lg p-6 mb-6 transition-colors duration-300">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="bg-white dark:bg-[#1c2230] rounded-2xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 transition-colors duration-300">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 sm:gap-4">
           <div>
-            <h2 id="raceName" class="text-2xl font-bold text-slate-800 dark:text-slate-100"></h2>
+            <h2 id="raceName" class="text-lg sm:text-2xl font-bold text-slate-800 dark:text-slate-100"></h2>
             <p id="raceDescription" class="text-slate-600 dark:text-slate-400 mt-1"></p>
           </div>
           <button id="backBtn" class="self-start md:self-center px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#252d3d] dark:hover:bg-[#2d3548] dark:text-slate-200 rounded-lg text-sm font-medium transition">
@@ -241,31 +241,31 @@
         </div>
 
         <!-- Race Info Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-          <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 rounded-xl p-4">
-            <div class="text-sm text-blue-600 dark:text-blue-400 font-medium"><i class="fa-solid fa-calendar-days"></i> Duration</div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mt-4 sm:mt-6">
+          <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-950/30 dark:to-blue-900/20 rounded-xl p-3 sm:p-4">
+            <div class="text-xs sm:text-sm text-blue-600 dark:text-blue-400 font-medium"><i class="fa-solid fa-calendar-days"></i> Duration</div>
             <div id="raceDuration" class="text-base font-bold text-blue-900 dark:text-blue-200 mt-1"></div>
           </div>
-          <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20 rounded-xl p-4">
-            <div class="text-sm text-green-600 dark:text-green-400 font-medium"><i class="fa-solid fa-person-running"></i> Participants</div>
+          <div class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-950/30 dark:to-green-900/20 rounded-xl p-3 sm:p-4">
+            <div class="text-xs sm:text-sm text-green-600 dark:text-green-400 font-medium"><i class="fa-solid fa-person-running"></i> Participants</div>
             <div id="totalRunners" class="text-lg font-bold text-green-900 dark:text-green-200 mt-1">0</div>
           </div>
-          <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20 rounded-xl p-4">
-            <div class="text-sm text-purple-600 dark:text-purple-400 font-medium"><i class="fa-solid fa-route"></i> Total Distance</div>
+          <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-950/30 dark:to-purple-900/20 rounded-xl p-3 sm:p-4">
+            <div class="text-xs sm:text-sm text-purple-600 dark:text-purple-400 font-medium"><i class="fa-solid fa-route"></i> Total Distance</div>
             <div id="totalDistance" class="text-lg font-bold text-purple-900 dark:text-purple-200 mt-1">0 km</div>
           </div>
-          <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/20 rounded-xl p-4">
-            <div class="text-sm text-orange-600 dark:text-orange-400 font-medium"><i class="fa-solid fa-clock"></i> Status</div>
+          <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-950/30 dark:to-orange-900/20 rounded-xl p-3 sm:p-4">
+            <div class="text-xs sm:text-sm text-orange-600 dark:text-orange-400 font-medium"><i class="fa-solid fa-clock"></i> Status</div>
             <div id="raceStatus" class="text-lg font-bold text-orange-900 dark:text-orange-200 mt-1"></div>
           </div>
         </div>
       </div>
 
       <!-- Leaderboard Controls -->
-      <div class="bg-white dark:bg-[#1c2230] rounded-2xl shadow-lg p-6 mb-6 transition-colors duration-300">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-200"><i class="fa-solid fa-trophy" style="color:#FFD43B"></i> Leaderboard</h3>
+      <div class="bg-white dark:bg-[#1c2230] rounded-2xl shadow-lg p-4 sm:p-6 mb-4 sm:mb-6 transition-colors duration-300">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div class="flex items-center gap-2 sm:gap-3 flex-wrap">
+            <h3 class="text-base sm:text-lg font-semibold text-slate-700 dark:text-slate-200"><i class="fa-solid fa-trophy" style="color:#FFD43B"></i> Leaderboard</h3>
             <!-- Team/Runners tab — only shown when team_mode is on -->
             <div id="viewTabs" class="hidden flex gap-1 bg-slate-100 dark:bg-[#151921] rounded-lg p-1">
               <button data-view="runners" class="view-tab active px-3 py-1 rounded-md text-sm font-medium transition">
@@ -278,14 +278,14 @@
           </div>
 
           <!-- Sort buttons -->
-          <div id="sortButtons" class="flex gap-2">
-            <button data-sort="km" class="sort-btn active px-4 py-2 rounded-lg text-sm font-medium transition">
+          <div id="sortButtons" class="flex gap-1.5 sm:gap-2">
+            <button data-sort="km" class="sort-btn active px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition">
               <i class="fa-solid fa-route"></i> Distance
             </button>
-            <button data-sort="pace" class="sort-btn px-4 py-2 rounded-lg text-sm font-medium transition">
+            <button data-sort="pace" class="sort-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition">
               <i class="fa-solid fa-bolt"></i> Pace
             </button>
-            <button data-sort="goal" class="sort-btn px-4 py-2 rounded-lg text-sm font-medium transition" id="goalSortBtn" style="display:none">
+            <button data-sort="goal" class="sort-btn px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition" id="goalSortBtn" style="display:none">
               <i class="fa-solid fa-bullseye"></i> Goal
             </button>
           </div>
@@ -293,18 +293,18 @@
       </div>
 
       <!-- Leaderboard / Teams container -->
-      <div id="leaderboard" class="space-y-3"></div>
+      <div id="leaderboard" class="space-y-2 sm:space-y-3"></div>
 
     </div>
   </main>
 
   <!-- Activity Modal -->
-  <div id="activityModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-    <div class="bg-white dark:bg-[#1c2230] rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden transition-colors duration-300">
-      <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+  <div id="activityModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-end sm:items-center justify-center sm:p-4">
+    <div class="bg-white dark:bg-[#1c2230] rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-4xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-hidden transition-colors duration-300">
+      <div class="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
         <div>
-          <h3 id="modalRunnerName" class="text-xl font-bold text-slate-800 dark:text-slate-100"></h3>
-          <p id="modalRunnerStats" class="text-sm text-slate-600 dark:text-slate-400 mt-1"></p>
+          <h3 id="modalRunnerName" class="text-base sm:text-xl font-bold text-slate-800 dark:text-slate-100"></h3>
+          <p id="modalRunnerStats" class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 mt-1"></p>
         </div>
         <button id="closeModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,7 +312,7 @@
           </svg>
         </button>
       </div>
-      <div id="modalContent" class="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+      <div id="modalContent" class="p-4 sm:p-6 overflow-y-auto max-h-[calc(95vh-100px)] sm:max-h-[calc(90vh-120px)]">
         <!-- Activities will be inserted here -->
       </div>
     </div>

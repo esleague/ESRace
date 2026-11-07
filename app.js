@@ -245,8 +245,8 @@ function renderProgressBar(percent, totalKm, goalKm) {
   return `
     <div class="mt-2">
       <div class="flex items-center justify-between mb-1">
-        <span class="text-sm font-medium text-slate-600 dark:text-slate-300">${totalKm.toFixed(2)} / ${goalKm} km</span>
-        <span class="text-sm font-bold ${tier.textClass}">${percent.toFixed(1)}%${badge}</span>
+        <span class="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-300">${totalKm.toFixed(2)} / ${goalKm} km</span>
+        <span class="text-xs sm:text-sm font-bold ${tier.textClass}">${percent.toFixed(1)}%${badge}</span>
       </div>
       <div class="w-full bg-slate-200 dark:bg-[#151921] rounded-full h-3 overflow-hidden ${tier.glowClass}">
         <div class="h-full rounded-full transition-all duration-500 relative overflow-hidden ${tier.shimmerClass}" style="width: ${barWidth}%; background: ${tier.gradient};"></div>
@@ -278,33 +278,33 @@ function renderGoalLeaderboard(runners) {
     const percent = runner.goal_progress || 0;
 
     return `
-      <div class="hover:shadow-xl transition-all duration-300 rounded-xl p-4 border-3 ${getRankStyle(runner.rank)}">
-        <div class="flex items-center gap-4">
+      <div class="hover:shadow-xl transition-all duration-300 rounded-xl p-3 sm:p-4 border-3 ${getRankStyle(runner.rank)}">
+        <div class="flex items-center gap-2 sm:gap-4">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 rounded-full ${getRankCircleStyle(runner.rank)} flex items-center justify-center border-2">
-              <span class="font-bold text-lg">${getMedalIcon(runner.rank)}</span>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-full ${getRankCircleStyle(runner.rank)} flex items-center justify-center border-2">
+              <span class="font-bold text-sm sm:text-lg">${getMedalIcon(runner.rank)}</span>
             </div>
           </div>
           <img
             src="${runner.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(runner.name)}"
             alt="${runner.name}"
             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(runner.name)}'"
-            class="w-14 h-14 rounded-full object-cover border-3 ${isTopThree ? 'border-primary-400' : 'border-slate-300'} flex-shrink-0"
+            class="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-3 ${isTopThree ? 'border-primary-400' : 'border-slate-300'} flex-shrink-0 hidden sm:block"
           />
           <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
+            <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+              <span class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-sm sm:text-lg' : 'text-sm sm:text-base'} truncate">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
               ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
             </div>
             ${hasGoal
               ? renderProgressBar(percent, runner.total_km, runner.goal)
-              : '<div class="mt-1 text-sm text-slate-400">No goal set</div>'
+              : '<div class="mt-1 text-xs sm:text-sm text-slate-400">No goal set</div>'
             }
           </div>
           <div class="text-right flex-shrink-0">
             <button
               onclick="showActivities('${currentRace.id}', '${runner.myvne_id}', '${runner.name.replace(/'/g, "\\'")}')"
-              class="text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
+              class="text-xs sm:text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
             >View details →</button>
           </div>
         </div>
@@ -344,28 +344,28 @@ function renderGoalTeams(teams) {
 
     return `
       <div class="hover:shadow-xl transition-all duration-300 rounded-xl border-3 ${getRankStyle(rank)} overflow-hidden">
-        <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center gap-2 sm:gap-4 p-3 sm:p-4">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 rounded-full ${getRankCircleStyle(rank)} flex items-center justify-center border-2">
-              <span class="font-bold text-lg">${getMedalIcon(rank)}</span>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-full ${getRankCircleStyle(rank)} flex items-center justify-center border-2">
+              <span class="font-bold text-sm sm:text-lg">${getMedalIcon(rank)}</span>
             </div>
           </div>
           <div class="flex-1 min-w-0">
-            <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
-            <div class="text-sm text-slate-500 dark:text-slate-300 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
+            <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-sm sm:text-lg' : 'text-sm sm:text-base'} truncate">${team.name}</div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
             ${hasGoal
               ? renderProgressBar(percent, team.team_km, team.team_goal)
-              : '<div class="mt-1 text-sm text-slate-400">No goal set</div>'
+              : '<div class="mt-1 text-xs sm:text-sm text-slate-400">No goal set</div>'
             }
           </div>
           <div class="text-right flex-shrink-0">
             <button
               onclick="toggleTeamMembers('${team.team_id}')"
-              class="text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
+              class="text-xs sm:text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
             >Members ▾</button>
           </div>
         </div>
-        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-4 py-3 space-y-3">
+        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-3 sm:px-4 py-2 sm:py-3 space-y-2 sm:space-y-3">
           ${team.members.length === 0
             ? '<p class="text-sm text-slate-400">No members</p>'
             : team.members
@@ -375,15 +375,15 @@ function renderGoalTeams(teams) {
                   const mHasGoal = m.goal != null;
                   const mPercent = m.goal_progress || 0;
                   return `
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
                       <span class="text-xs text-slate-400 w-4">${i + 1}</span>
                       <img
                         src="${m.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name)}"
                         onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}'"
-                        class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
+                        class="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
                       />
                       <div class="flex-1 min-w-0">
-                        <span class="text-sm font-medium text-slate-700 dark:text-slate-300">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
+                        <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 truncate">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
                         ${mHasGoal
                           ? `<div class="flex items-center gap-2 mt-1">
                               <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
@@ -419,31 +419,31 @@ function renderLeaderboard(runners) {
   container.innerHTML = runners.map(runner => {
     const isTopThree = runner.rank <= 3;
     return `
-      <div class="hover:shadow-xl transition-all duration-300 rounded-xl p-4 border-3 ${getRankStyle(runner.rank)}">
-        <div class="flex items-center gap-4">
+      <div class="hover:shadow-xl transition-all duration-300 rounded-xl p-3 sm:p-4 border-3 ${getRankStyle(runner.rank)}">
+        <div class="flex items-center gap-2 sm:gap-4">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 rounded-full ${getRankCircleStyle(runner.rank)} flex items-center justify-center border-2">
-              <span class="font-bold text-lg">${getMedalIcon(runner.rank)}</span>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-full ${getRankCircleStyle(runner.rank)} flex items-center justify-center border-2">
+              <span class="font-bold text-sm sm:text-lg">${getMedalIcon(runner.rank)}</span>
             </div>
           </div>
           <img
             src="${runner.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(runner.name)}"
             alt="${runner.name}"
             onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(runner.name)}'"
-            class="w-14 h-14 rounded-full object-cover border-3 ${isTopThree ? 'border-primary-400' : 'border-slate-300'} flex-shrink-0"
+            class="w-10 h-10 sm:w-14 sm:h-14 rounded-full object-cover border-3 ${isTopThree ? 'border-primary-400' : 'border-slate-300'} flex-shrink-0"
           />
           <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
+            <div class="flex items-center gap-1 sm:gap-2 flex-wrap">
+              <span class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-sm sm:text-lg' : 'text-sm sm:text-base'} truncate">${runner.name}${renderViolationIcon(runner.violations)}${renderInactiveBadge(runner.is_inactive)}</span>
               ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
             </div>
-            <div class="text-sm text-slate-500 dark:text-slate-300 mt-1">${ICONS.bolt} ${formatPace(runner.avg_pace)}</div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5 sm:mt-1">${ICONS.bolt} ${formatPace(runner.avg_pace)}</div>
           </div>
           <div class="text-right flex-shrink-0">
-            <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${runner.total_km} km</div>
+            <div class="text-lg sm:text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${runner.total_km} km</div>
             <button
               onclick="showActivities('${currentRace.id}', '${runner.myvne_id}', '${runner.name.replace(/'/g, "\\'")}')"
-              class="text-sm text-primary-600 hover:text-primary-800 font-medium mt-1 hover:underline"
+              class="text-xs sm:text-sm text-primary-600 hover:text-primary-800 font-medium mt-1 hover:underline"
             >View details →</button>
           </div>
         </div>
@@ -469,42 +469,42 @@ function renderTeams(teams) {
     return `
       <div class="hover:shadow-xl transition-all duration-300 rounded-xl border-3 ${getRankStyle(rank)} overflow-hidden">
         <!-- Team header row -->
-        <div class="flex items-center gap-4 p-4">
+        <div class="flex items-center gap-2 sm:gap-4 p-3 sm:p-4">
           <div class="flex-shrink-0">
-            <div class="w-12 h-12 rounded-full ${getRankCircleStyle(rank)} flex items-center justify-center border-2">
-              <span class="font-bold text-lg">${getMedalIcon(rank)}</span>
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-full ${getRankCircleStyle(rank)} flex items-center justify-center border-2">
+              <span class="font-bold text-sm sm:text-lg">${getMedalIcon(rank)}</span>
             </div>
           </div>
           <div class="flex-1 min-w-0">
-            <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-lg' : 'text-base'}">${team.name}</div>
-            <div class="text-sm text-slate-500 mt-1">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
+            <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-sm sm:text-lg' : 'text-sm sm:text-base'} truncate">${team.name}</div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5 sm:mt-1">${ICONS.users} ${team.member_count} members • ${ICONS.runner} ${team.total_activities} activities</div>
           </div>
-          <div class="text-right flex-shrink-0 flex flex-col items-end gap-1">
-            <div class="text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${team.total_km.toFixed(2)} km</div>
+          <div class="text-right flex-shrink-0 flex flex-col items-end gap-0.5 sm:gap-1">
+            <div class="text-lg sm:text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${team.total_km.toFixed(2)} km</div>
             <button
               onclick="toggleTeamMembers('${team.team_id}')"
-              class="text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
+              class="text-xs sm:text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline"
             >Members ▾</button>
           </div>
         </div>
         <!-- Expandable member list -->
-        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-4 py-3 space-y-2">
+        <div id="team-members-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-3 sm:px-4 py-2 sm:py-3 space-y-1.5 sm:space-y-2">
           ${team.members.length === 0
             ? '<p class="text-sm text-slate-400">No members</p>'
             : team.members
                 .slice()
                 .sort((a, b) => b.total_km - a.total_km)
                 .map((m, i) => `
-                  <div class="flex items-center gap-3">
+                  <div class="flex items-center gap-2 sm:gap-3">
                     <span class="text-xs text-slate-400 w-4">${i + 1}</span>
                     <img
                       src="${m.avatar || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.name)}"
                       onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}'"
-                      class="w-8 h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
+                      class="w-6 h-6 sm:w-8 sm:h-8 rounded-full object-cover border border-slate-300 flex-shrink-0"
                     />
-                    <span class="flex-1 text-sm font-medium text-slate-700">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
-                    <span class="text-sm text-slate-500">${ICONS.bolt} ${formatPace(m.avg_pace)}</span>
-                    <span class="text-sm font-semibold text-primary-600">${m.total_km.toFixed(2)} km</span>
+                    <span class="flex-1 text-xs sm:text-sm font-medium text-slate-700 truncate">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
+                    <span class="text-xs sm:text-sm text-slate-500 hidden sm:inline">${ICONS.bolt} ${formatPace(m.avg_pace)}</span>
+                    <span class="text-xs sm:text-sm font-semibold text-primary-600">${m.total_km.toFixed(2)} km</span>
                   </div>
                 `).join('')
           }
@@ -716,38 +716,38 @@ function renderActivities(activities, runnerName, stats) {
     content.innerHTML = '<p class="text-slate-500 text-center py-8">No activities found</p>';
   } else {
     content.innerHTML = `
-      <div class="space-y-3">
+      <div class="space-y-2 sm:space-y-3">
         ${activities.map((a, idx) => {
           const invalid = !a.is_counted;
           const reason = invalid && a.type_err != null && a.type_err !== 0 ? (TYPE_ERR_LABELS[a.type_err] || 'Invalid') : null;
           const zebra = !invalid && idx % 2 === 1 ? 'bg-slate-100 dark:bg-[#252d3d]' : 'bg-slate-50 dark:bg-[#1c2230]/60';
           return `
-          <div class="${invalid ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40' : zebra} rounded-lg p-4 transition">
-            <div class="flex items-start justify-between mb-2">
-              <div class="flex-1">
-                <div class="flex items-center gap-2 flex-wrap">
-                  <span class="font-semibold ${invalid ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'}">${a.name}</span>
-                  ${invalid ? `<span class="text-xs px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-medium"><i class="fa-solid fa-ban"></i> ${reason}</span>` : ''}
+          <div class="${invalid ? 'bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/40' : zebra} rounded-lg p-3 sm:p-4 transition">
+            <div class="flex items-start justify-between mb-1.5 sm:mb-2">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                  <span class="font-semibold text-sm sm:text-base ${invalid ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-100'} truncate">${a.name}</span>
+                  ${invalid ? `<span class="text-xs px-1.5 sm:px-2 py-0.5 bg-red-100 text-red-600 rounded-full font-medium"><i class="fa-solid fa-ban"></i> ${reason}</span>` : ''}
                 </div>
-                <div class="text-sm text-slate-500 mt-1">${formatDateTime(a.start_date_formatted)}</div>
+                <div class="text-xs sm:text-sm text-slate-500 mt-0.5 sm:mt-1">${formatDateTime(a.start_date_formatted)}</div>
               </div>
-              <div class="text-right">
-                <div class="font-bold ${invalid ? 'line-through text-slate-400' : 'text-primary-600 dark:text-slate-300'}">${a.distance_km} km</div>
+              <div class="text-right flex-shrink-0 ml-2">
+                <div class="font-bold text-sm sm:text-base ${invalid ? 'line-through text-slate-400' : 'text-primary-600 dark:text-slate-300'}">${a.distance_km} km</div>
                 <div class="text-xs text-slate-500 dark:text-slate-400">${a.moving_time_formatted}</div>
               </div>
             </div>
-            <div class="grid grid-cols-3 gap-3 mt-3 pt-3 border-t ${invalid ? 'border-red-200 dark:border-red-800' : 'border-slate-200 dark:border-slate-600'}">
+            <div class="grid grid-cols-3 gap-2 sm:gap-3 mt-2 sm:mt-3 pt-2 sm:pt-3 border-t ${invalid ? 'border-red-200 dark:border-red-800' : 'border-slate-200 dark:border-slate-600'}">
               <div>
                 <div class="text-xs text-slate-500 dark:text-slate-400">Distance</div>
-                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${a.distance_km} km</div>
+                <div class="text-xs sm:text-sm font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${a.distance_km} km</div>
               </div>
               <div>
                 <div class="text-xs text-slate-500 dark:text-slate-400">Avg HR</div>
-                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${a.average_heartrate || '-'} bpm</div>
+                <div class="text-xs sm:text-sm font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${a.average_heartrate || '-'} bpm</div>
               </div>
               <div>
                 <div class="text-xs text-slate-500 dark:text-slate-400">Pace</div>
-                <div class="font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${formatPaceFromMs(a.average_speed_ms)}</div>
+                <div class="text-xs sm:text-sm font-medium ${invalid ? 'text-slate-400' : 'text-slate-700 dark:text-slate-300'}">${formatPaceFromMs(a.average_speed_ms)}</div>
               </div>
             </div>
           </div>
@@ -818,7 +818,7 @@ function renderRaceList(races) {
     return `
       <button
         onclick="loadRace('${race.id}')"
-        class="race-card bg-white dark:bg-[#1c2230] hover:shadow-xl transition-all duration-300 rounded-xl p-6 text-left border-2 border-transparent hover:border-primary-500"
+        class="race-card bg-white dark:bg-[#1c2230] hover:shadow-xl transition-all duration-300 rounded-xl p-4 sm:p-6 text-left border-2 border-transparent hover:border-primary-500"
       >
         <div class="flex items-center justify-between mb-2">
           <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">${race.name}</h3>
