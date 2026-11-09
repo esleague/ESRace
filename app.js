@@ -568,29 +568,30 @@ function renderAvgTeams(teams) {
         <div id="avg-detail-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-3 sm:px-4 py-2 sm:py-3">
           <table class="w-full text-xs sm:text-sm">
             <thead>
-              <tr class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-[#2a3244]">
-                <th class="text-left py-1.5 font-medium">Member</th>
-                <th class="text-right py-1.5 font-medium">KM</th>
-                <th class="text-right py-1.5 font-medium">Weighted</th>
+              <tr class="bg-slate-200/70 dark:bg-[#252d3d]">
+                <th class="text-left py-2 px-2 sm:px-3 font-semibold text-slate-600 dark:text-slate-300 rounded-tl-lg">Member</th>
+                <th class="text-right py-2 px-2 sm:px-3 font-semibold text-slate-600 dark:text-slate-300">KM</th>
+                <th class="text-right py-2 px-2 sm:px-3 font-semibold text-slate-600 dark:text-slate-300 rounded-tr-lg">Weighted</th>
               </tr>
             </thead>
             <tbody>
-              ${memberRows.map(m => `
-                <tr class="border-b border-slate-100 dark:border-[#1e2535]">
-                  <td class="py-1.5 text-slate-700 dark:text-slate-300 truncate max-w-[120px] sm:max-w-none">${m.name}${m.isFemale ? ' <span class="text-xs text-pink-500">♀ ×2</span>' : ''}</td>
-                  <td class="text-right py-1.5 text-slate-600 dark:text-slate-400 font-variant-numeric tabular-nums">${m.km.toFixed(2)}</td>
-                  <td class="text-right py-1.5 font-semibold text-slate-800 dark:text-slate-200 font-variant-numeric tabular-nums">${m.weighted.toFixed(2)}</td>
+              ${memberRows.map((m, i) => `
+                <tr class="${i % 2 === 0 ? 'bg-white/60 dark:bg-[#1c2230]/60' : 'bg-slate-100/60 dark:bg-[#212838]/60'}">
+                  <td class="py-2 px-2 sm:px-3 text-slate-700 dark:text-slate-300 truncate max-w-[120px] sm:max-w-none">${m.name}${m.isFemale ? ' <span class="text-xs text-pink-400 dark:text-pink-300">♀ ×2</span>' : ''}</td>
+                  <td class="text-right py-2 px-2 sm:px-3 text-slate-500 dark:text-slate-400">${m.km.toFixed(2)}</td>
+                  <td class="text-right py-2 px-2 sm:px-3 font-semibold text-slate-700 dark:text-slate-200">${m.weighted.toFixed(2)}</td>
                 </tr>
               `).join('')}
             </tbody>
             <tfoot>
-              <tr class="font-semibold text-slate-800 dark:text-slate-200 border-t border-slate-200 dark:border-[#2a3244]">
-                <td class="pt-2 pb-1">Total (${team.member_count} members)</td>
-                <td class="text-right pt-2 pb-1">${team.total_km.toFixed(2)}</td>
-                <td class="text-right pt-2 pb-1">${team.weighted_km.toFixed(2)}</td>
+              <tr class="bg-slate-200/50 dark:bg-[#252d3d]/80 font-semibold text-slate-700 dark:text-slate-200">
+                <td class="py-2 px-2 sm:px-3">Total (${team.member_count})</td>
+                <td class="text-right py-2 px-2 sm:px-3">${team.total_km.toFixed(2)}</td>
+                <td class="text-right py-2 px-2 sm:px-3">${team.weighted_km.toFixed(2)}</td>
               </tr>
-              <tr class="text-primary-600 dark:text-primary-400">
-                <td class="pb-2 pt-1 text-xs sm:text-sm" colspan="3">Final = ${team.weighted_km.toFixed(2)} / ${team.member_count} = <span class="font-bold">${team.avg_km.toFixed(2)} km</span></td>
+              <tr class="bg-primary-50/60 dark:bg-primary-900/15">
+                <td class="py-2 px-2 sm:px-3 text-primary-600 dark:text-primary-400 rounded-bl-lg" colspan="2">Final = ${team.weighted_km.toFixed(2)} / ${team.member_count}</td>
+                <td class="text-right py-2 px-2 sm:px-3 font-bold text-primary-700 dark:text-primary-300 rounded-br-lg">${team.avg_km.toFixed(2)} km</td>
               </tr>
             </tfoot>
           </table>
