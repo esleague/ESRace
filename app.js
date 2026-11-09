@@ -539,6 +539,15 @@ function renderAvgTeams(teams) {
   container.innerHTML = sorted.map((team, index) => {
     const rank = index + 1;
     const isTopThree = rank <= 3;
+    const memberRows = (team.members || [])
+      .map(m => {
+        const km = m.total_km || 0;
+        const isFemale = m.sex === 'female';
+        const weighted = isFemale ? km * 2 : km;
+        return { name: m.name, km, weighted, isFemale };
+      })
+      .sort((a, b) => b.weighted - a.weighted);
+
     return `
       <div class="hover:shadow-xl transition-all duration-300 rounded-xl border-3 ${getRankStyle(rank)} overflow-hidden">
         <div class="flex items-center gap-2 sm:gap-4 p-3 sm:p-4">
@@ -553,8 +562,38 @@ function renderAvgTeams(teams) {
           </div>
           <div class="text-right flex-shrink-0">
             <div class="text-lg sm:text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${team.avg_km.toFixed(2)} km</div>
-            <div class="text-xs text-slate-500 dark:text-slate-400">avg/member</div>
+            <button onclick="toggleAvgDetail('${team.team_id}')" class="text-xs sm:text-sm text-primary-600 hover:text-primary-800 font-medium hover:underline">Detail ▾</button>
           </div>
+        </div>
+        <div id="avg-detail-${team.team_id}" class="team-members-list border-t border-slate-100 dark:border-[#2a3244] bg-slate-50 dark:bg-[#151921] px-3 sm:px-4 py-2 sm:py-3">
+          <table class="w-full text-xs sm:text-sm">
+            <thead>
+              <tr class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-[#2a3244]">
+                <th class="text-left py-1.5 font-medium">Member</th>
+                <th class="text-right py-1.5 font-medium">KM</th>
+                <th class="text-right py-1.5 font-medium">Weighted</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${memberRows.map(m => `
+                <tr class="border-b border-slate-100 dark:border-[#1e2535]">
+                  <td class="py-1.5 text-slate-700 dark:text-slate-300 truncate max-w-[120px] sm:max-w-none">${m.name}${m.isFemale ? ' <span class="text-xs text-pink-500">♀ ×2</span>' : ''}</td>
+                  <td class="text-right py-1.5 text-slate-600 dark:text-slate-400 font-variant-numeric tabular-nums">${m.km.toFixed(2)}</td>
+                  <td class="text-right py-1.5 font-semibold text-slate-800 dark:text-slate-200 font-variant-numeric tabular-nums">${m.weighted.toFixed(2)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+            <tfoot>
+              <tr class="font-semibold text-slate-800 dark:text-slate-200 border-t border-slate-200 dark:border-[#2a3244]">
+                <td class="pt-2 pb-1">Total (${team.member_count} members)</td>
+                <td class="text-right pt-2 pb-1">${team.total_km.toFixed(2)}</td>
+                <td class="text-right pt-2 pb-1">${team.weighted_km.toFixed(2)}</td>
+              </tr>
+              <tr class="text-primary-600 dark:text-primary-400">
+                <td class="pb-2 pt-1 text-xs sm:text-sm" colspan="3">Final = ${team.weighted_km.toFixed(2)} / ${team.member_count} = <span class="font-bold">${team.avg_km.toFixed(2)} km</span></td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
     `;
@@ -754,6 +793,14 @@ function setView(view) {
   }
 }
 
+function toggleAvgDetail(teamId) {
+  const el = document.getElementById(`avg-detail-${teamId}`);
+  if (!el) return;
+  el.classList.toggle('open');
+  const btn = el.previousElementSibling?.querySelector('button[onclick*="toggleAvgDetail"]');
+  if (btn) btn.textContent = el.classList.contains('open') ? 'Detail ▴' : 'Detail ▾';
+}
+
 function toggleTeamMembers(teamId) {
   const el = document.getElementById(`team-members-${teamId}`);
   if (!el) return;
@@ -852,6 +899,7 @@ document.querySelectorAll('.view-tab').forEach(btn => {
 window.loadRace = loadRace;
 window.showActivities = showActivities;
 window.toggleTeamMembers = toggleTeamMembers;
+window.toggleAvgDetail = toggleAvgDetail;
 
 // ==========================================
 // INIT
