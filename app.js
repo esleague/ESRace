@@ -515,6 +515,46 @@ function renderTeams(teams) {
 }
 
 // ==========================================
+// RENDERING — TEAMS (AVG/MEMBER VIEW)
+// ==========================================
+function renderAvgTeams(teams) {
+  const container = document.getElementById('leaderboard');
+
+  if (!teams || teams.length === 0) {
+    container.innerHTML = '<p class="text-slate-500 dark:text-slate-400 text-center py-8">No teams yet</p>';
+    return;
+  }
+
+  const sorted = teams
+    .map(t => ({ ...t, avg_km: t.member_count > 0 ? t.total_km / t.member_count : 0 }))
+    .sort((a, b) => b.avg_km - a.avg_km);
+
+  container.innerHTML = sorted.map((team, index) => {
+    const rank = index + 1;
+    const isTopThree = rank <= 3;
+    return `
+      <div class="hover:shadow-xl transition-all duration-300 rounded-xl border-3 ${getRankStyle(rank)} overflow-hidden">
+        <div class="flex items-center gap-2 sm:gap-4 p-3 sm:p-4">
+          <div class="flex-shrink-0">
+            <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-full ${getRankCircleStyle(rank)} flex items-center justify-center border-2">
+              <span class="font-bold text-sm sm:text-lg">${getMedalIcon(rank)}</span>
+            </div>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-sm sm:text-lg' : 'text-sm sm:text-base'} truncate">${team.name}</div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.distance} ${team.total_km.toFixed(2)} km total</div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <div class="text-lg sm:text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${team.avg_km.toFixed(2)} km</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400">avg/member</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==========================================
 // ACTIONS
 // ==========================================
 function collapseRaceSelector() {
@@ -621,7 +661,9 @@ async function showActivities(raceId, myvneId, runnerName) {
 function sortLeaderboard(sortType) {
   currentSort = sortType;
 
-  if (sortType === 'goal') {
+  if (sortType === 'avg') {
+    renderAvgTeams(currentTeams);
+  } else if (sortType === 'goal') {
     if (currentView === 'runners') {
       renderGoalLeaderboard(currentRunners);
     } else {
@@ -655,8 +697,16 @@ function setView(view) {
 
   sortButtons.classList.remove('hidden');
 
+  const avgBtn = document.getElementById('avgSortBtn');
+
   if (view === 'runners') {
     paceBtn.style.display = '';
+    avgBtn.style.display = 'none';
+    if (currentSort === 'avg') {
+      currentSort = 'km';
+      document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelector('[data-sort="km"]').classList.add('active');
+    }
     if (currentSort === 'goal') {
       renderGoalLeaderboard(currentRunners);
     } else {
@@ -664,6 +714,7 @@ function setView(view) {
     }
   } else {
     paceBtn.style.display = 'none';
+    avgBtn.style.display = '';
     if (currentSort === 'pace') {
       currentSort = 'km';
       document.querySelectorAll('.sort-btn').forEach(btn => btn.classList.remove('active'));
@@ -678,7 +729,8 @@ function setView(view) {
       fetchTeams(currentRace.id).then(teams => {
         currentTeams = teams || [];
         if (currentView === 'teams') {
-          if (currentSort === 'goal') renderGoalTeams(currentTeams);
+          if (currentSort === 'avg') renderAvgTeams(currentTeams);
+          else if (currentSort === 'goal') renderGoalTeams(currentTeams);
           else renderTeams(currentTeams);
         }
       }).catch(() => {
@@ -688,7 +740,8 @@ function setView(view) {
         }
       });
     } else {
-      if (currentSort === 'goal') renderGoalTeams(currentTeams);
+      if (currentSort === 'avg') renderAvgTeams(currentTeams);
+      else if (currentSort === 'goal') renderGoalTeams(currentTeams);
       else renderTeams(currentTeams);
     }
   }
