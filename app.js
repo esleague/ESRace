@@ -385,12 +385,12 @@ function renderGoalTeams(teams) {
                       <div class="flex-1 min-w-0">
                         <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 truncate">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
                         ${mHasGoal
-                          ? `<div class="flex items-center gap-2 mt-1">
-                              <div class="flex-1 bg-slate-200 rounded-full h-2 overflow-hidden">
-                                <div class="h-full rounded-full" style="width: ${Math.min(mPercent, 100)}%; background: ${getGoalColor(mPercent)};"></div>
+                          ? (() => { const mTier = getGoalTier(mPercent); return `<div class="flex items-center gap-2 mt-1">
+                              <div class="flex-1 bg-slate-200 dark:bg-[#151921] rounded-full h-2 overflow-hidden ${mTier.glowClass}">
+                                <div class="h-full rounded-full relative overflow-hidden ${mTier.shimmerClass}" style="width: ${Math.min(mPercent, 100)}%; background: ${mTier.gradient};"></div>
                               </div>
-                              <span class="text-xs font-semibold ${getGoalTextColor(mPercent)}">${mPercent.toFixed(1)}%</span>
-                            </div>`
+                              <span class="text-xs font-semibold ${mTier.textClass}">${mPercent.toFixed(1)}%</span>
+                            </div>`; })()
                           : '<div class="text-xs text-slate-400">No goal</div>'
                         }
                       </div>
