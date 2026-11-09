@@ -526,7 +526,14 @@ function renderAvgTeams(teams) {
   }
 
   const sorted = teams
-    .map(t => ({ ...t, avg_km: t.member_count > 0 ? t.total_km / t.member_count : 0 }))
+    .map(t => {
+      const weightedKm = (t.members || []).reduce((sum, m) => {
+        const km = m.total_km || 0;
+        return sum + (m.sex === 'female' ? km * 2 : km);
+      }, 0);
+      const avg_km = t.member_count > 0 ? weightedKm / t.member_count : 0;
+      return { ...t, avg_km, weighted_km: weightedKm };
+    })
     .sort((a, b) => b.avg_km - a.avg_km);
 
   container.innerHTML = sorted.map((team, index) => {
@@ -542,7 +549,7 @@ function renderAvgTeams(teams) {
           </div>
           <div class="flex-1 min-w-0">
             <div class="font-semibold text-slate-800 dark:text-slate-100 ${isTopThree ? 'text-sm sm:text-lg' : 'text-sm sm:text-base'} truncate">${team.name}</div>
-            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.distance} ${team.total_km.toFixed(2)} km total</div>
+            <div class="text-xs sm:text-sm text-slate-500 dark:text-slate-300 mt-0.5">${ICONS.users} ${team.member_count} members • ${ICONS.distance} ${team.weighted_km.toFixed(2)} km weighted</div>
           </div>
           <div class="text-right flex-shrink-0">
             <div class="text-lg sm:text-2xl font-bold ${isTopThree ? 'text-primary-700 dark:text-slate-200' : 'text-primary-600 dark:text-slate-300'}">${team.avg_km.toFixed(2)} km</div>
