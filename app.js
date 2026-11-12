@@ -190,15 +190,55 @@ function renderInactiveBadge(isInactive) {
 // ==========================================
 // GOAL PROGRESS HELPERS
 // ==========================================
-function getGoalTier(percent) {
+const MTHW_ID = '1127425836';
+
+function getMthwTier(percent) {
+  if (percent >= 400) return {
+    gradient: 'linear-gradient(90deg, #be185d, #ef4444, #f59e0b, #ec4899, #a855f7, #db2777, #be185d)',
+    textClass: 'text-pink-700', badgeText: '🌋 MYTHIC',
+    badgeCls: 'bg-pink-100 text-pink-700',
+    glowClass: 'glow-pink-mythic', shimmerClass: 'bar-shimmer-ultra',
+  };
+  if (percent >= 350) return {
+    gradient: 'linear-gradient(90deg, #ec4899, #db2777, #a855f7, #db2777, #ec4899)',
+    textClass: 'text-pink-600', badgeText: '💎 DIAMOND',
+    badgeCls: 'bg-pink-100 text-pink-600',
+    glowClass: 'glow-pink-diamond', shimmerClass: 'bar-shimmer-intense',
+  };
   if (percent >= 300) return {
-    gradient: 'linear-gradient(90deg, #06b6d4, #3b82f6, #8b5cf6, #f97316, #eab308)',
+    gradient: 'linear-gradient(90deg, #f9a8d4, #ec4899, #db2777, #ec4899, #f9a8d4)',
+    textClass: 'text-pink-600', badgeText: '👑 LEGEND',
+    badgeCls: 'bg-pink-100 text-pink-600',
+    glowClass: 'glow-pink-legend', shimmerClass: 'bar-shimmer-intense',
+  };
+  return null;
+}
+
+function getGoalTier(percent, myvneId) {
+  if (myvneId === MTHW_ID && percent >= 300) {
+    const pink = getMthwTier(percent);
+    if (pink) return pink;
+  }
+  if (percent >= 400) return {
+    gradient: 'linear-gradient(90deg, #dc2626, #ea580c, #eab308, #22c55e, #06b6d4, #8b5cf6, #ec4899, #ef4444)',
+    textClass: 'text-red-600', badgeText: '🌋 MYTHIC',
+    badgeCls: 'bg-red-100 text-red-600',
+    glowClass: 'glow-mythic', shimmerClass: 'bar-shimmer-ultra',
+  };
+  if (percent >= 350) return {
+    gradient: 'linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7, #ec4899, #a855f7, #6366f1)',
+    textClass: 'text-purple-600', badgeText: '💎 DIAMOND',
+    badgeCls: 'bg-purple-100 text-purple-600',
+    glowClass: 'glow-diamond', shimmerClass: 'bar-shimmer-intense',
+  };
+  if (percent >= 300) return {
+    gradient: 'linear-gradient(90deg, #b45309, #eab308, #fde047, #eab308, #b45309)',
     textClass: 'text-amber-700', badgeText: '👑 LEGEND',
     badgeCls: 'bg-amber-100 text-amber-700',
     glowClass: 'glow-gold', shimmerClass: 'bar-shimmer-intense',
   };
   if (percent >= 250) return {
-    gradient: 'linear-gradient(90deg, #2563eb, #7c3aed, #ef4444, #f97316)',
+    gradient: 'linear-gradient(90deg, #dc2626, #ef4444, #f97316, #ef4444, #dc2626)',
     textClass: 'text-red-600', badgeText: '🔥 2.5x',
     badgeCls: 'bg-red-100 text-red-600',
     glowClass: 'glow-red', shimmerClass: 'bar-shimmer',
@@ -227,17 +267,17 @@ function getGoalTier(percent) {
   return { gradient: '#3b82f6', textClass: 'text-blue-500', badgeText: '', badgeCls: '', glowClass: '', shimmerClass: '' };
 }
 
-function getGoalColor(percent) {
-  return getGoalTier(percent).gradient;
+function getGoalColor(percent, myvneId) {
+  return getGoalTier(percent, myvneId).gradient;
 }
 
-function getGoalTextColor(percent) {
-  return getGoalTier(percent).textClass;
+function getGoalTextColor(percent, myvneId) {
+  return getGoalTier(percent, myvneId).textClass;
 }
 
-function renderProgressBar(percent, totalKm, goalKm) {
+function renderProgressBar(percent, totalKm, goalKm, myvneId) {
   const barWidth = Math.min(percent, 100);
-  const tier = getGoalTier(percent);
+  const tier = getGoalTier(percent, myvneId);
   const badge = tier.badgeText
     ? ` <span class="text-sm font-bold px-1.5 py-0.5 rounded ${tier.badgeCls}">${tier.badgeText}</span>`
     : '';
@@ -297,7 +337,7 @@ function renderGoalLeaderboard(runners) {
               ${!runner.is_competitive ? `<span class="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full border border-blue-300">${ICONS.shield}</span>` : ''}
             </div>
             ${hasGoal
-              ? renderProgressBar(percent, runner.total_km, runner.goal)
+              ? renderProgressBar(percent, runner.total_km, runner.goal, runner.myvne_id)
               : '<div class="mt-1 text-xs sm:text-sm text-slate-400">No goal set</div>'
             }
           </div>
@@ -385,7 +425,7 @@ function renderGoalTeams(teams) {
                       <div class="flex-1 min-w-0">
                         <span class="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 truncate">${m.name}${renderViolationIcon(m.violations)}${renderInactiveBadge(m.is_inactive)}</span>
                         ${mHasGoal
-                          ? (() => { const mTier = getGoalTier(mPercent); return `<div class="flex items-center gap-2 mt-1">
+                          ? (() => { const mTier = getGoalTier(mPercent, m.myvne_id); return `<div class="flex items-center gap-2 mt-1">
                               <div class="flex-1 bg-slate-200 dark:bg-[#151921] rounded-full h-2 overflow-hidden ${mTier.glowClass}">
                                 <div class="h-full rounded-full relative overflow-hidden ${mTier.shimmerClass}" style="width: ${Math.min(mPercent, 100)}%; background: ${mTier.gradient};"></div>
                               </div>
